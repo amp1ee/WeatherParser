@@ -17,7 +17,7 @@ public class WeatherParser {
         List<Icons> iconsList = new ArrayList<>();
         List<String> urls = new ArrayList<>();
 
-        String FILE_NAME = "D:/Weather-links10.txt";
+        String FILE_NAME = "D:/Weather-links30.txt";
 
         //new Icons("D:/Weather-links.txt"); // -- получить список названий осадков (Summary) на сайте
 
