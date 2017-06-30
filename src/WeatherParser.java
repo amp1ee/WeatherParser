@@ -12,12 +12,19 @@ import java.util.*;
  */
 public class WeatherParser {
 
-    public static void main(String[] args) throws IOException {
+    int connections;
+    List<String> urls;
+
+    public void parse(String toFile) throws IOException {
         List<Temperatures> temperaturesList = new ArrayList<>();
         List<Icons> iconsList = new ArrayList<>();
-        List<String> urls = new ArrayList<>();
 
-        String FILE_NAME = "D:/Weather-links30.txt";
+
+        Calendar cal = Calendar.getInstance();
+        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
+        String curDay = String.valueOf(dayOfMonth);
+
+        String FILE_NAME = "./Weather-links.txt";
 
         //new Icons("D:/Weather-links.txt"); // -- получить список названий осадков (Summary) на сайте
 
@@ -26,17 +33,29 @@ public class WeatherParser {
                         new FileInputStream(FILE_NAME)));
         String line;
 
+        urls = new ArrayList<>();
         while ((line = reader.readLine()) != null) {
             urls.add(line);
+
         }
+
+        reader.close();
 
         List<Document> docs = new ArrayList<>();
 
         //connecting to cities' latest weather links and getting 'Document' entities;
-        int connections = 0;
+        connections = 0;
+        float percentage;
+        String[] split;
+
         for (String url : urls) {
+            split = url.split("/");
+            FileSaveDialog.cururl.setText(split[4]);
             docs.add(Jsoup.connect(url).get());
             connections++;
+            percentage = (connections * 100/ urls.size());
+            System.out.println(percentage);
+            FileSaveDialog.progress.setValue((int)percentage);
             System.out.println("connected: " + url + " ("+connections+")");
         }
 
@@ -46,17 +65,6 @@ public class WeatherParser {
 
             Element forecast = doc.getElementsByClass("forecasts").first();
             elementsList.add(forecast);
-            /*else {
-                //System.out.println(forecast);
-                forecast = doc.getElementsByClass("forecasts");
-                Elements f2= forecast.next();
-               //System.out.println("\n"+f2);
-                Element f3 =f2.first();
-
-                System.out.println("\n"+f3);
-                elementsList.add(forecast);
-
-            }*/ //TODO
 
         }
 
@@ -68,9 +76,7 @@ public class WeatherParser {
         String dayIcon = null;
         String nightIcon = null;
 
-        Calendar cal = Calendar.getInstance();
-        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
-        String curDay = String.valueOf(dayOfMonth);
+
         //System.out.println("Today is " + curDay + "*");
         int domPos = 0;
 
@@ -167,10 +173,10 @@ public class WeatherParser {
             System.out.println(icons.getDayIcon()+ " " + icons.getNightIcon());
         }
 
+        JsonExporter exporter = new JsonExporter();
 
-            JsonExporter exporter = new JsonExporter();
+        exporter.save(temperaturesList, iconsList, toFile);
 
-            exporter.save(temperaturesList, iconsList);
     }
 
 }

@@ -6,6 +6,8 @@ import forJson.Wthr;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,11 +22,11 @@ class JsonExporter {
 
     WthrContainer container = new WthrContainer();
 
-    void save(List<Temperatures> tList, List<Icons> iList) {
-        try (FileWriter writer = new FileWriter("D://weather.json")) {
-
-
-            List<String> reg = Deserializator.deserealize("./regions.json");
+    void save(List<Temperatures> tList, List<Icons> iList, String toFile) {
+        FileWriter writer = null;
+        try  {
+            writer = new FileWriter(toFile);
+            List<String> reg = Deserializator.deserealize("./src/regs.json");
             for (int i = 0; i< tList.size(); i++) {
                 Wthr w = new Wthr();
                 w.setCity(reg.get(i));
@@ -42,8 +44,19 @@ class JsonExporter {
 
             GSON.toJson(container, writer);
 
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (writer!=null) {
+                try {
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
     }
 
