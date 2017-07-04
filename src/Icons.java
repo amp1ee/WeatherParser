@@ -37,7 +37,7 @@ class Icons {
             this.dayIcon = "icon_sun";
         } else
         if (origDayIcon.equals("light snow")) {
-            this.dayIcon = "icon_snow_rain";
+            this.dayIcon = "icon_rain+snow";
         } else
         if (origDayIcon.contains("snow")) {
             this.dayIcon = "icon_snow";
@@ -59,7 +59,7 @@ class Icons {
             this.nightIcon = "icon_moon";
         } else
         if (origNightIcon.equals("light snow")) {
-                this.nightIcon="icon_snow_rain";
+                this.nightIcon="icon_rain+snow";
         } else
         if (origNightIcon.contains("snow")) {
             this.nightIcon = "icon_snow";

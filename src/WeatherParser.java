@@ -24,13 +24,18 @@ public class WeatherParser {
         int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
         String curDay = String.valueOf(dayOfMonth);
 
-        String FILE_NAME = "./Weather-links.txt";
+        if (Integer.parseInt(curDay) < 10) {
+            curDay = "0" + curDay;
+        }
+
+        System.out.println("today "+curDay);
+
+        String FILE_NAME = "Weather-links.txt";
 
         //new Icons("D:/Weather-links.txt"); // -- получить список названий осадков (Summary) на сайте
 
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream(FILE_NAME)));
+                new InputStreamReader(WeatherParser.class.getResourceAsStream(FILE_NAME)));
         String line;
 
         urls = new ArrayList<>();
@@ -76,8 +81,6 @@ public class WeatherParser {
         String dayIcon = null;
         String nightIcon = null;
 
-
-        //System.out.println("Today is " + curDay + "*");
         int domPos = 0;
 
         for (Element elements : elementsList) {    //elementsList -- список html-элементов с классом "forecasts" из ссылок
@@ -102,7 +105,7 @@ public class WeatherParser {
                 //смотрим позицию сегодняшней колонки в таблице
                 for (Element dom : daysOfMonth) {
                     String day = dom.text();
-                    //System.out.println("Date: "+day);
+                    System.out.println("Date: "+day);
                     if (day.equals(curDay)) {
                         domPos = 0;
                     } else if (!day.equalsIgnoreCase(curDay))
@@ -127,6 +130,7 @@ public class WeatherParser {
                 //определяем необходимый номер элемента в строке таблицы
                 if (domPos == 0) {
                     childNumber = dayTimeCnt + 3;
+                    System.out.println("childNumber "+ childNumber);
                 }
                 if (domPos == 1) {
                     childNumber = dayTimeCnt + 6;
@@ -165,13 +169,13 @@ public class WeatherParser {
             domPos = 0;
         }
 
-        for (Temperatures tmps : temperaturesList) {
+        /*for (Temperatures tmps : temperaturesList) {
             System.out.println(tmps.getDayT() + " " + tmps.getNightT());
         }
 
         for (Icons icons : iconsList) {
             System.out.println(icons.getDayIcon()+ " " + icons.getNightIcon());
-        }
+        }*/
 
         JsonExporter exporter = new JsonExporter();
 

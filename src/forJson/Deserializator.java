@@ -3,7 +3,8 @@ package forJson;
 import com.google.gson.*;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +13,8 @@ public class Deserializator {
     private static Gson gson = new Gson();
     private static List<String> regList = new ArrayList<>();
 
-    public static void main(String[] args) {
-
-    }
-
-    public static List<String> deserealize(String jsonFilePath) throws FileNotFoundException {
-        FileReader input = new FileReader(jsonFilePath);
+    public static List<String> deserialize(String jsonFilePath) throws FileNotFoundException {
+        Reader input = new InputStreamReader(Deserializator.class.getResourceAsStream(jsonFilePath));
         WthrContainer mr = gson.fromJson(input, WthrContainer.class);
         List<Wthr> wthrList = mr.getWthr();
         for (Wthr w : wthrList) {

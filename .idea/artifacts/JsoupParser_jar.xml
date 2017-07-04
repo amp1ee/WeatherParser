@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JsoupParser:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JsoupParser_jar</output-path>
+    <root id="archive" name="JsoupParser.jar">
+      <element id="module-output" name="JsoupParser" />
+      <element id="library" level="project" name="jackson-core-2.8.8" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/gson-2.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/src/jsoup-1.10.3.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

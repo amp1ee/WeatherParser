@@ -6,8 +6,6 @@ import forJson.Wthr;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,7 +24,7 @@ class JsonExporter {
         FileWriter writer = null;
         try  {
             writer = new FileWriter(toFile);
-            List<String> reg = Deserializator.deserealize("./src/regs.json");
+            List<String> reg = Deserializator.deserialize("regs.json");
             for (int i = 0; i< tList.size(); i++) {
                 Wthr w = new Wthr();
                 w.setCity(reg.get(i));

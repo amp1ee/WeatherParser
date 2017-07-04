@@ -1,12 +1,11 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class FileSaveDialog  {
@@ -27,16 +26,15 @@ public class FileSaveDialog  {
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setFileFilter(new FileNameExtensionFilter("JSON only", "json"));
 
-        Date d = new Date();
-        SimpleDateFormat day = new SimpleDateFormat("d");
-        SimpleDateFormat sdf = new SimpleDateFormat("_MM_y");
-        String today = day.format(d);
+        Date dt = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.DATE, 1); //tomorrow date
+        dt = c.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
+        String tomorrow = sdf.format(dt);
 
-        int t = Integer.valueOf(today);
-        t++;
-        String m_and_y = sdf.format(d);
-        String tom = String.valueOf(t); //tomorrow
-        String defaultName = "weather_"+tom+m_and_y+".json";
+        String defaultName = "weather_"+tomorrow+".json";
 
         fc.setSelectedFile(new File(defaultName));
 
@@ -53,7 +51,7 @@ public class FileSaveDialog  {
             progress = new JProgressBar();
             progress.setStringPainted(true);
             progress.setFont(font);
-            progress.setPreferredSize( new Dimension (300, 40));
+            progress.setPreferredSize( new Dimension (340, 40));
             progress.setForeground(Color.BLACK);
 
             cururl = new JLabel("");
