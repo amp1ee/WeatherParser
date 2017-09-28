@@ -1,0 +1,5 @@
+http://www.weather-forecast.com/locations/Berlin/forecasts/latest
+http://www.weather-forecast.com/locations/Liverpool/forecasts/latest
+http://www.weather-forecast.com/locations/Munich/forecasts/latest
+http://www.weather-forecast.com/locations/Potsdam/forecasts/latest
+http://www.weather-forecast.com/locations/Melbourne/forecasts/latest

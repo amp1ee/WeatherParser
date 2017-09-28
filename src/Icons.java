@@ -42,6 +42,8 @@ class Icons {
         if (origDayIcon.contains("snow")) {
             this.dayIcon = "icon_snow";
         }
+        else
+            this.dayIcon = "icon_sun_n_clouds";
 
         if (origNightIcon.contains("rain")) {
             this.nightIcon = "icon_rain";
@@ -64,9 +66,8 @@ class Icons {
         if (origNightIcon.contains("snow")) {
             this.nightIcon = "icon_snow";
         }
-
-
-
+        else
+            this.nightIcon = "icon_cloud_moon";
     }
 
     private void collect() throws IOException {
@@ -91,7 +92,6 @@ class Icons {
 
     Icons(String dayIcon, String nightIcon) throws IOException {
         adaptNames(dayIcon, nightIcon);
-
     }
 
     String getDayIcon() {

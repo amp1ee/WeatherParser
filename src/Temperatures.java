@@ -61,9 +61,6 @@ class Temperatures {
         }
 
 
-
-
-
         if (minDay > 0) {
             this.minDayT = "+".concat(this.minDayT).concat("°");
         } else {

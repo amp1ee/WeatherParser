@@ -1,20 +1,43 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 
 public class FileSaveDialog  {
-    static WeatherParser wp;
-    static JProgressBar progress;
-    static JLabel cururl;
-    static JFrame frame;
-    static Font font;
+    public static JLabel cururl;
+    public static JProgressBar progress = new JProgressBar();
+    private static JFrame frame;
+    private static final String propFilename = System.getProperty("user.home") + "/w2json_dir.prop";
 
+    private static void storeDir(String path) {
+        Properties p = new Properties();
+        path = path.substring(0, path.lastIndexOf(File.separator)); //path without fileName
+        System.out.println(path);
+        p.setProperty("lastDir", path + "\\");
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(propFilename))){
+            p.store(bw, "Last used folder for Weather2JSONParser");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    private static void restoreDir(JFileChooser fc, String name) {
+        Properties p = new Properties();
+        try (BufferedReader br = new BufferedReader(new FileReader(propFilename))) {
+            p.load(br);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File f = new File(p.getProperty("lastDir") + name);
+        fc.setSelectedFile(f);
+    }
 
     public static void main(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException, InstantiationException, IllegalAccessException {
 
@@ -36,11 +59,18 @@ public class FileSaveDialog  {
 
         String defaultName = "weather_"+tomorrow+".json";
 
-        fc.setSelectedFile(new File(defaultName));
+        File f = new File(defaultName);
+
+        File optionsFile = new File(propFilename);
+        if (optionsFile.exists()) {
+            restoreDir(fc, defaultName);
+        } else {
+            fc.setSelectedFile(f);
+        }
 
         if (fc.showSaveDialog(save) == JFileChooser.APPROVE_OPTION) {
             //
-            font = new Font("Sans-serif", Font.PLAIN, 18);
+            Font font = new Font("Sans-serif", Font.PLAIN, 18);
             frame = new JFrame();
             frame.setSize(350,100);
             frame.setResizable(false);
@@ -48,7 +78,18 @@ public class FileSaveDialog  {
             frame.setTitle("Parsing weather-forecast.com...");
             frame.setLayout(new FlowLayout());
 
-            progress = new JProgressBar();
+            frame.addWindowListener( new WindowAdapter() {
+                public void windowClosing(WindowEvent we) {
+                    try {
+                        storeDir(fc.getSelectedFile().getAbsolutePath());
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                    System.exit(0);
+                }
+            });
+
+
             progress.setStringPainted(true);
             progress.setFont(font);
             progress.setPreferredSize( new Dimension (340, 40));
@@ -58,7 +99,7 @@ public class FileSaveDialog  {
             cururl.setVerticalAlignment(JLabel.BOTTOM);
             cururl.setFont(new Font("Sans-serif", Font.BOLD, 14));
             cururl.setVisible(true);
-            //progress.setIndeterminate(true);
+
             frame.add(progress);
             frame.add(cururl);
             frame.setVisible(true);
@@ -69,7 +110,7 @@ public class FileSaveDialog  {
             System.exit(0);
         }
 
-        wp = new WeatherParser();
+        WeatherParser wp = new WeatherParser();
         try {
             wp.parse(fc.getSelectedFile().getAbsolutePath());
 
