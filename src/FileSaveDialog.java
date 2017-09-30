@@ -18,7 +18,6 @@ public class FileSaveDialog  {
     private static void storeDir(String outPath, String inPath) {
         Properties p = new Properties();
         outPath = outPath.substring(0, outPath.lastIndexOf(File.separator)); //path without fileName
-        //inPath = inPath.substring(0, inPath.lastIndexOf(File.separator)); //path without fileName
         p.setProperty("lastDir", outPath + "\\");
         p.setProperty("urlDir", inPath);
 

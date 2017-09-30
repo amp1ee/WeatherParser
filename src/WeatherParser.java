@@ -191,8 +191,9 @@ public class WeatherParser {
         if (failed) {
             FileWriter writer = null;
             try {
-                File log = new File(FileSaveDialog.class.getProtectionDomain().getCodeSource()
-                        .getLocation().toURI().getPath() + "failed_links.log");
+                String location = FileSaveDialog.class.getProtectionDomain().getCodeSource()
+                        .getLocation().toURI().getPath();
+                File log = new File(location + ".log");
                 writer = new FileWriter(log);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
