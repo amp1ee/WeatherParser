@@ -15,7 +15,7 @@ public class WeatherParser {
     int connections;
     List<String> urls;
 
-    public void parse(String toFile) throws IOException {
+    public void parse(String toFile, String urls_lst) throws IOException {
         List<Temperatures> temperaturesList = new ArrayList<>();
         List<Icons> iconsList = new ArrayList<>();
 
@@ -23,25 +23,19 @@ public class WeatherParser {
         int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
         String curDay = String.valueOf(dayOfMonth);
 
-        if (Integer.parseInt(curDay) < 10) {
+        if (Integer.parseInt(curDay) < 10)
             curDay = "0" + curDay;
-        }
-
-        System.out.println("today " + curDay);
-
-        String FILE_NAME = "Weather-links.txt";
+//        String FILE_NAME = "Weather-links.txt";
 
         //new Icons("D:/Weather-links.txt"); // -- получить список названий осадков (Summary) на сайте
 
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(WeatherParser.class.getResourceAsStream(FILE_NAME)));
+                new InputStreamReader(new FileInputStream(urls_lst)));
         String line;
 
         urls = new ArrayList<>();
-        while ((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null)
             urls.add(line);
-
-        }
         reader.close();
 
         //connecting to cities' latest weather links and getting 'Document' entities;
@@ -56,10 +50,11 @@ public class WeatherParser {
         String dayIcon = null;
         String nightIcon = null;
         int domPos = 0;
-
+        List<String> cities = new ArrayList<>();
         for (String url : urls) {
             split = url.split("/");
             FileSaveDialog.cururl.setText(split[4]);
+            cities.add(split[4]);
             Document doc = Jsoup.connect(url).get();
             Element forecast = doc.getElementsByClass("forecasts").get(0); //1 - я таблица
             catched = false;
@@ -107,7 +102,7 @@ public class WeatherParser {
                 time = dayTime.text();
             else
                 time = "Night";
-            System.out.println(time);
+            //System.out.println(time);
             switch (time) {
                 case "AM":
                     dayTimeCnt = 2;
@@ -147,7 +142,7 @@ public class WeatherParser {
 
             for (Element row : tBody) {
                 dayIcon = row.child(catched ? 6 : 5).child(childNumber).text();
-                System.out.println(dayIcon);
+               // System.out.println(dayIcon);
                 nightIcon = row.child(catched ? 6 : 5).child(childNumber + 1).text();
             }
 
@@ -161,11 +156,11 @@ public class WeatherParser {
             connections++;
             percentage = (connections * 100 / urls.size());
             FileSaveDialog.progress.setValue((int) percentage);
-            System.out.println("connected: " + url + " (" + connections + ")");
+            //System.out.println("connected: " + url + " (" + connections + ")");
             domPos = 0;
         }
 
-        new JsonExporter().save(temperaturesList, iconsList, toFile);
+        new JsonExporter().save(temperaturesList, iconsList, toFile, cities);
 
     }
 }
