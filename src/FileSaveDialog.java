@@ -122,11 +122,11 @@ public class FileSaveDialog  {
 
         WeatherParser wp = new WeatherParser();
         try {
-            wp.parse(fc.getSelectedFile().getAbsolutePath(),
+            boolean failed = wp.parse(fc.getSelectedFile().getAbsolutePath(),
                     urlsChooser.getSelectedFile().getAbsolutePath());
             if (wp.connections >= wp.urls.size()) {
-                frame.setTitle("Success");
-                cururl.setText("Parsing finished!");
+                frame.setTitle(failed ? "Finished with errors" : "Success");
+                cururl.setText(failed ? "Finished with errors (see log file)." : "Parsing finished successfully!");
 
                 try {
                     Thread.sleep(2000);

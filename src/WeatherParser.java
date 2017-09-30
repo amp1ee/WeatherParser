@@ -4,7 +4,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Parsing
@@ -14,8 +16,9 @@ public class WeatherParser {
 
     int connections;
     List<String> urls;
+    private Document doc;
 
-    public void parse(String toFile, String urls_lst) throws IOException {
+    public boolean parse(String toFile, String urls_lst) throws IOException {
         List<Temperatures> temperaturesList = new ArrayList<>();
         List<Icons> iconsList = new ArrayList<>();
 
@@ -25,10 +28,7 @@ public class WeatherParser {
 
         if (Integer.parseInt(curDay) < 10)
             curDay = "0" + curDay;
-//        String FILE_NAME = "Weather-links.txt";
-
         //new Icons("D:/Weather-links.txt"); // -- получить список названий осадков (Summary) на сайте
-
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(urls_lst)));
         String line;
@@ -47,15 +47,42 @@ public class WeatherParser {
         String minDayT = null;
         String minNightT = null;
         boolean catched;
+        boolean failed = false;
+        List<String> failList = new ArrayList<>();
         String dayIcon = null;
         String nightIcon = null;
         int domPos = 0;
         List<String> cities = new ArrayList<>();
         for (String url : urls) {
             split = url.split("/");
-            FileSaveDialog.cururl.setText(split[4]);
-            cities.add(split[4]);
-            Document doc = Jsoup.connect(url).get();
+            String cityFromUrl = split.length > 4 ? split[4] : url;
+            FileSaveDialog.cururl.setText(cityFromUrl);
+            cities.add(cityFromUrl);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<?> future = executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        doc = Jsoup.connect(url).get();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+            });
+
+            executor.shutdown();
+            try {
+                future.get(15, TimeUnit.SECONDS);  //     <-- wait 8 seconds to finish
+            } catch (InterruptedException e) {    //     <-- possible error cases
+                System.out.println("job was interrupted");
+            } catch (ExecutionException e) {
+                System.out.println("caught exception: " + e.getCause());
+            } catch (TimeoutException e) {
+                future.cancel(true);              //     <-- interrupt the job
+                failed = true;
+                failList.add(url + " - timeout");
+            }
+
             Element forecast = doc.getElementsByClass("forecasts").get(0); //1 - я таблица
             catched = false;
             Elements maxTempRows = forecast.children().get(0).getElementsByClass("max-temp-row");
@@ -74,14 +101,19 @@ public class WeatherParser {
             }
             finally {
                 if (catched) {
-                    forecast = doc.getElementsByClass("long-range").get(0);
-                    maxTempRows = forecast.children().get(0).getElementsByClass("max-temp-row");
-                    minTempRows = forecast.children().get(0).getElementsByClass("min-temp-row");
-                    daysOfMonth = forecast.getElementsByClass("dom")
-                            .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
-                    dayTime = forecast.getElementsByClass("pname")
-                            .first().getElementsByClass("pname");
-                    tBody = forecast.getElementsByTag("tbody");
+                    try {
+                        forecast = doc.getElementsByClass("long-range").get(0);
+                        maxTempRows = forecast.children().get(0).getElementsByClass("max-temp-row");
+                        minTempRows = forecast.children().get(0).getElementsByClass("min-temp-row");
+                        daysOfMonth = forecast.getElementsByClass("dom")
+                                .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
+                        dayTime = forecast.getElementsByClass("pname")
+                                .first().getElementsByClass("pname");
+                        tBody = forecast.getElementsByTag("tbody");
+                    } catch (IndexOutOfBoundsException iobe) {
+                        failed = true;
+                        failList.add(url);
+                    }
                 }
             }
 
@@ -102,7 +134,6 @@ public class WeatherParser {
                 time = dayTime.text();
             else
                 time = "Night";
-            //System.out.println(time);
             switch (time) {
                 case "AM":
                     dayTimeCnt = 2;
@@ -142,7 +173,6 @@ public class WeatherParser {
 
             for (Element row : tBody) {
                 dayIcon = row.child(catched ? 6 : 5).child(childNumber).text();
-               // System.out.println(dayIcon);
                 nightIcon = row.child(catched ? 6 : 5).child(childNumber + 1).text();
             }
 
@@ -156,11 +186,32 @@ public class WeatherParser {
             connections++;
             percentage = (connections * 100 / urls.size());
             FileSaveDialog.progress.setValue((int) percentage);
-            //System.out.println("connected: " + url + " (" + connections + ")");
             domPos = 0;
         }
-
+        if (failed) {
+            FileWriter writer = null;
+            try {
+                File log = new File(FileSaveDialog.class.getProtectionDomain().getCodeSource()
+                        .getLocation().toURI().getPath() + "failed_links.log");
+                writer = new FileWriter(log);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            int i = 0;
+            while (i < failList.size() && writer != null) {
+                writer.write(failList.get(i) + System.lineSeparator());
+                i++;
+            }
+            if (writer != null) {
+                try {
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    System.err.println("Log writer closing error");
+                }
+            }
+        }
         new JsonExporter().save(temperaturesList, iconsList, toFile, cities);
-
+        return failed;
     }
 }
