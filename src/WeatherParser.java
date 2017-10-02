@@ -5,8 +5,12 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.*;
+import java.util.logging.Formatter;
 
 /**
  * Parsing
@@ -72,7 +76,7 @@ public class WeatherParser {
 
             executor.shutdown();
             try {
-                future.get(15, TimeUnit.SECONDS);  //     <-- wait 8 seconds to finish
+                future.get(11, TimeUnit.SECONDS);  //     <-- wait 8 seconds to finish
             } catch (InterruptedException e) {    //     <-- possible error cases
                 System.out.println("job was interrupted");
             } catch (ExecutionException e) {
@@ -80,7 +84,7 @@ public class WeatherParser {
             } catch (TimeoutException e) {
                 future.cancel(true);              //     <-- interrupt the job
                 failed = true;
-                failList.add(url + " - timeout");
+                failList.add(url + " - [TIMEOUT]");
             }
 
             Element forecast = doc.getElementsByClass("forecasts").get(0); //1 - я таблица
@@ -112,7 +116,7 @@ public class WeatherParser {
                         tBody = forecast.getElementsByTag("tbody");
                     } catch (IndexOutOfBoundsException iobe) {
                         failed = true;
-                        failList.add(url);
+                        failList.add(url + " - [PARSE ERROR]");
                     }
                 }
             }
@@ -189,30 +193,46 @@ public class WeatherParser {
             domPos = 0;
         }
         if (failed) {
-            FileWriter writer = null;
+            Logger logger = Logger.getLogger("WParser errors");
+            FileHandler fh;
             try {
                 String location = FileSaveDialog.class.getProtectionDomain().getCodeSource()
                         .getLocation().toURI().getPath();
-                File log = new File(location + ".log");
-                writer = new FileWriter(log);
+                fh = new FileHandler(location.substring(1, location.length()) + ".log", true);
+                fh.setFormatter(new LogFormatter());
+                logger.addHandler(fh);
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
             int i = 0;
-            while (i < failList.size() && writer != null) {
-                writer.write(failList.get(i) + System.lineSeparator());
+            while (i < failList.size()) {
+                logger.log(Level.SEVERE,failList.get(i) + System.lineSeparator());
                 i++;
-            }
-            if (writer != null) {
-                try {
-                    writer.flush();
-                    writer.close();
-                } catch (IOException e) {
-                    System.err.println("Log writer closing error");
-                }
             }
         }
         new JsonExporter().save(temperaturesList, iconsList, toFile, cities);
         return failed;
+    }
+}
+
+class LogFormatter extends Formatter {
+    // Create a DateFormat to format the logger timestamp.
+    private static final DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+
+    public String format(LogRecord record) {
+        StringBuilder builder = new StringBuilder(1000);
+        builder.append(df.format(new Date(record.getMillis()))).append(" - ");
+        builder.append("[").append(record.getLevel()).append("] - ");
+        builder.append(formatMessage(record));
+        builder.append("\n");
+        return builder.toString();
+    }
+
+    public String getHead(Handler h) {
+        return super.getHead(h);
+    }
+
+    public String getTail(Handler h) {
+        return super.getTail(h);
     }
 }
