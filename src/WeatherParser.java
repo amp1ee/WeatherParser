@@ -209,6 +209,7 @@ public class WeatherParser {
                 logger.log(Level.SEVERE,failList.get(i) + System.lineSeparator());
                 i++;
             }
+            logger.getHandlers()[0].close();
         }
         new JsonExporter().save(temperaturesList, iconsList, toFile, cities);
         return failed;
