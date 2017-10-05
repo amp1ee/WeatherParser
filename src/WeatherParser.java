@@ -12,10 +12,6 @@ import java.util.concurrent.*;
 import java.util.logging.*;
 import java.util.logging.Formatter;
 
-/**
- * Parsing
- * Created by djamp on 27.06.2017.
- */
 public class WeatherParser {
 
     int connections;
@@ -84,7 +80,7 @@ public class WeatherParser {
             } catch (TimeoutException e) {
                 future.cancel(true);              //     <-- interrupt the job
                 failed = true;
-                failList.add(url + " - [TIMEOUT]");
+                failList.add("TIMEOUT - " + url);
             }
 
             Element forecast = doc.getElementsByClass("forecasts").get(0); //1 - я таблица
@@ -116,7 +112,7 @@ public class WeatherParser {
                         tBody = forecast.getElementsByTag("tbody");
                     } catch (IndexOutOfBoundsException iobe) {
                         failed = true;
-                        failList.add(url + " - [PARSE ERROR]");
+                        failList.add("PARSE ERROR - " + url);
                     }
                 }
             }
@@ -223,7 +219,6 @@ class LogFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder builder = new StringBuilder(1000);
         builder.append(df.format(new Date(record.getMillis()))).append(" - ");
-        builder.append("[").append(record.getLevel()).append("] - ");
         builder.append(formatMessage(record));
         builder.append("\n");
         return builder.toString();
