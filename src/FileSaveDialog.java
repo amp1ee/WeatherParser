@@ -132,7 +132,8 @@ public class FileSaveDialog  {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                if (!failed)
+                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
             }
         } catch (IOException e) {
             e.printStackTrace();
