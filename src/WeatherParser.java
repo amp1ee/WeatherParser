@@ -73,7 +73,7 @@ public class WeatherParser {
 
             executor.shutdown();
             try {
-                future.get(11, TimeUnit.SECONDS);  //     <-- wait 8 seconds to finish
+                future.get(15, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
             } catch (InterruptedException e) {    //     <-- possible error cases
                 System.out.println("job was interrupted");
             } catch (ExecutionException e) {

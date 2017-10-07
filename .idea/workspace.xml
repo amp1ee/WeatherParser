@@ -8,7 +8,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ac38f8d2-b0bf-4228-aa0a-02f27a41b53f" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FileSaveDialog.java" afterPath="$PROJECT_DIR$/src/FileSaveDialog.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WeatherParser.java" afterPath="$PROJECT_DIR$/src/WeatherParser.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -51,8 +50,8 @@
       <file leaf-file-name="WeatherParser.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/WeatherParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="67" column="47" lean-forward="true" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
+            <state relative-caret-position="625">
+              <caret line="75" column="29" lean-forward="false" selection-start-line="75" selection-start-column="29" selection-end-line="75" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -806,7 +805,7 @@
       <workItem from="1506979132801" duration="1153000" />
       <workItem from="1507203610098" duration="260000" />
       <workItem from="1507222862104" duration="506000" />
-      <workItem from="1507389581446" duration="222000" />
+      <workItem from="1507389581446" duration="323000" />
     </task>
     <task id="LOCAL-00001" summary="Some bug fixes&#10;&#10;Done some fixes">
       <created>1498716211814</created>
@@ -913,11 +912,18 @@
       <option name="project" value="LOCAL" />
       <updated>1507223105917</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Doesn't close automatically if failed anywhere.">
+      <created>1507389886477</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1507389886477</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="154843000" />
+    <option name="totallyTimeSpent" value="154944000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -975,7 +981,8 @@
     <MESSAGE value="Optimized logging" />
     <MESSAGE value="Optimized logging - minor fix" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="Doesn't close automatically if failed anywhere." />
+    <option name="LAST_COMMIT_MESSAGE" value="Doesn't close automatically if failed anywhere." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1134,8 +1141,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/WeatherParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="67" column="47" lean-forward="true" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
+        <state relative-caret-position="625">
+          <caret line="75" column="29" lean-forward="false" selection-start-line="75" selection-start-column="29" selection-end-line="75" selection-end-column="29" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
