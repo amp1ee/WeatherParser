@@ -8,7 +8,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ac38f8d2-b0bf-4228-aa0a-02f27a41b53f" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WeatherParser.java" afterPath="$PROJECT_DIR$/src/WeatherParser.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -805,7 +804,7 @@
       <workItem from="1506979132801" duration="1153000" />
       <workItem from="1507203610098" duration="260000" />
       <workItem from="1507222862104" duration="506000" />
-      <workItem from="1507389581446" duration="323000" />
+      <workItem from="1507389581446" duration="372000" />
     </task>
     <task id="LOCAL-00001" summary="Some bug fixes&#10;&#10;Done some fixes">
       <created>1498716211814</created>
@@ -919,11 +918,18 @@
       <option name="project" value="LOCAL" />
       <updated>1507389886477</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Increased timeout from 11 to 15 sec.">
+      <created>1507389943030</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1507389943030</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="154944000" />
+    <option name="totallyTimeSpent" value="154993000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -982,7 +988,8 @@
     <MESSAGE value="Optimized logging - minor fix" />
     <MESSAGE value="test" />
     <MESSAGE value="Doesn't close automatically if failed anywhere." />
-    <option name="LAST_COMMIT_MESSAGE" value="Doesn't close automatically if failed anywhere." />
+    <MESSAGE value="Increased timeout from 11 to 15 sec." />
+    <option name="LAST_COMMIT_MESSAGE" value="Increased timeout from 11 to 15 sec." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
