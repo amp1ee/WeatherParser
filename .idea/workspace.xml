@@ -715,7 +715,7 @@
       <workItem from="1507222862104" duration="506000" />
       <workItem from="1507389581446" duration="1298000" />
       <workItem from="1508765212498" duration="34000" />
-      <workItem from="1509095730707" duration="25000" />
+      <workItem from="1509095730707" duration="44000" />
     </task>
     <task id="LOCAL-00001" summary="Some bug fixes&#10;&#10;Done some fixes">
       <created>1498716211814</created>
@@ -843,11 +843,18 @@
       <option name="project" value="LOCAL" />
       <updated>1507389958245</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Test">
+      <created>1509095777144</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1509095777144</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="155978000" />
+    <option name="totallyTimeSpent" value="155997000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="0" />
@@ -906,7 +913,8 @@
     <MESSAGE value="test" />
     <MESSAGE value="Doesn't close automatically if failed anywhere." />
     <MESSAGE value="Increased timeout from 11 to 15 sec." />
-    <option name="LAST_COMMIT_MESSAGE" value="Increased timeout from 11 to 15 sec." />
+    <MESSAGE value="Test" />
+    <option name="LAST_COMMIT_MESSAGE" value="Test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
