@@ -19,7 +19,7 @@ public class WeatherParser {
     List<String> urls;
     private Document doc;
 
-    public boolean parse(String toFile, String urls_lst) throws IOException {
+    public boolean parse(String[] files, String urls_lst) throws IOException {
         List<Temperatures> temperaturesList = new ArrayList<>();
         List<Icons> iconsList = new ArrayList<>();
 
@@ -47,12 +47,12 @@ public class WeatherParser {
         String maxNightT = null;
         String minDayT = null;
         String minNightT = null;
-        boolean catched;
+        boolean caught;
         boolean failed = false;
         List<String> failList = new ArrayList<>();
         String dayIcon = null;
         String nightIcon = null;
-        int domPos = 0;
+        int domPos = 0; // Позиция текущего числа месяца в таблице
         List<String> cities = new ArrayList<>();
         for (String url : urls) {
             split = url.split("/");
@@ -60,17 +60,13 @@ public class WeatherParser {
             FileSaveDialog.cururl.setText(cityFromUrl);
             cities.add(cityFromUrl);
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<?> future = executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        doc = Jsoup.connect(url).get();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    }
+            Future<?> future = executor.submit(() -> {
+                try {
+                    doc = Jsoup.connect(url).get();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             });
-
             executor.shutdown();
             try {
                 future.get(15, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
@@ -84,24 +80,32 @@ public class WeatherParser {
                 failList.add("TIMEOUT - " + url);
             }
 
-            Element forecast = doc.getElementsByClass("forecasts").get(0); //1 - я таблица
-            catched = false;
-            Elements maxTempRows = forecast.children().get(0).getElementsByClass("max-temp-row");
-            Elements minTempRows = forecast.children().get(0).getElementsByClass("min-temp-row");
+            Element forecast0 = doc.getElementsByClass("forecasts").get(0); // 1-я таблица
+            Element forecast1 = doc.getElementsByClass("forecasts").get(1); // 2-я таблица
+            caught = false;
+            Elements maxTempRows0 = forecast0.children().get(0).getElementsByClass("max-temp-row");
+            Elements minTempRows0 = forecast0.children().get(0).getElementsByClass("min-temp-row");
+            Elements maxTempRows1 = forecast1.children().get(0).getElementsByClass("max-temp-row");
+            Elements minTempRows1 = forecast1.children().get(0).getElementsByClass("min-temp-row");
 
-            Elements daysOfMonth = forecast.getElementsByClass("dom")
+            Elements daysOfMonth0 = forecast0.getElementsByClass("dom")
                     .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
-            Elements tBody = forecast.getElementsByTag("tbody");
-            Elements dayTime;
+            Elements daysOfMonth1 = forecast1.getElementsByClass("dom")
+                    .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
+            Elements tBody0 = forecast0.getElementsByTag("tbody");
+            Elements tBody1 = forecast1.getElementsByTag("tbody");
+            Elements dayTime0;
+            Elements dayTime1;
             try {
-                dayTime = forecast.getElementsByClass("pname")
+                dayTime0 = forecast0.getElementsByClass("pname")
                         .first().getElementsByClass("pname"); //название времени суток в таблице на первом месте
             } catch (NullPointerException e) {
-                dayTime = null;
-                catched = true;
+                dayTime0 = null;
+                caught = true;
             }
+            /* //finally
             finally {
-                if (catched) {
+                if (caught) {
                     try {
                         forecast = doc.getElementsByClass("long-range").get(0);
                         maxTempRows = forecast.children().get(0).getElementsByClass("max-temp-row");
@@ -117,12 +121,11 @@ public class WeatherParser {
                     }
                 }
             }
-
+            */
             int dayTimeCnt;
             int childNumber = 0;
-
             //смотрим позицию сегодняшней колонки в таблице
-            for (Element dom : daysOfMonth) {
+            for (Element dom : daysOfMonth0) {
                 String day = dom.text();
                 if (day.equals(curDay)) {
                     domPos = 0;
@@ -131,8 +134,8 @@ public class WeatherParser {
             }
             //смотрим первый элемент с временем суток в таблице
             String time;
-            if (dayTime != null)
-                time = dayTime.text();
+            if (dayTime0 != null)
+                time = dayTime0.text();
             else
                 time = "Night";
             switch (time) {
@@ -146,49 +149,60 @@ public class WeatherParser {
                     dayTimeCnt = 0; //"Night"
                     break;
             }
+            //Завтра, послезавтра, ...
+            for (int i = 0; i < 3; i++) {
+                //определяем необходимый номер ячейки в строке таблицы (maxNightT)
+                childNumber = dayTimeCnt + 3 + (i * 3) + (domPos * 3);
 
-            //определяем необходимый номер элемента в строке таблицы
-            if (domPos == 0) {
-                childNumber = dayTimeCnt + 3;
-            }
-            if (domPos == 1) {
-                childNumber = dayTimeCnt + 6;
-            }
-            for (int k = 0; k < maxTempRows.size(); k++) {
-                maxDayT = maxTempRows.get(k).child(childNumber)
+                maxDayT = (childNumber <= 9) ? maxTempRows0.get(0).child(childNumber)
+                        .child(0).text()     : maxTempRows1.get(0).child(childNumber % 9)
                         .child(0).text();
-                maxNightT = maxTempRows.get(k).child(childNumber + 1)
+                maxNightT = ((childNumber + 1) <= 9) ? maxTempRows0.get(0).child(childNumber + 1)
+                        .child(0).text()             : maxTempRows1.get(0).child((childNumber + 1) % 9)
                         .child(0).text();
-                minDayT = maxTempRows.get(k).child(childNumber - 1)
+                minDayT = ((childNumber - 1) <= 9) ? maxTempRows0.get(0).child(childNumber - 1)
+                        .child(0).text()           : maxTempRows1.get(0).child((childNumber - 1) % 9)
                         .child(0).text();
-                minNightT = minTempRows.get(k).child(childNumber + 1)
+                minNightT = ((childNumber + 1) <= 9) ? minTempRows0.get(0).child(childNumber + 1)
+                        .child(0).text()             : minTempRows1.get(0).child((childNumber + 1) % 9)
                         .child(0).text();
 
-            }
-
-            if (maxNightT != null && minNightT != null) {
-                Temperatures t = new Temperatures(minDayT, maxDayT, minNightT, maxNightT);
-                t.adapt();
-                temperaturesList.add(t);
-            }
-
-            for (Element row : tBody) {
-                dayIcon = row.child(catched ? 6 : 5).child(childNumber).text();
-                nightIcon = row.child(catched ? 6 : 5).child(childNumber + 1).text();
-            }
-
-            if (dayIcon != null && nightIcon != null)
-                try {
-                    iconsList.add(new Icons(dayIcon, nightIcon));
-                } catch (IOException e) {
-                    e.printStackTrace();
+                /*
+                System.out.println("Weather for tomorrow + " + i);
+                System.out.println(cityFromUrl + "'s maxDayT: " + maxDayT);
+                System.out.println(cityFromUrl + "'s minDayT: " + minDayT);
+                System.out.println(cityFromUrl + "'s maxNightT: " + maxNightT);
+                System.out.println(cityFromUrl + "'s minNightT: " + minNightT);
+                */
+                if (maxNightT != null && minNightT != null) {
+                    Temperatures t = new Temperatures(minDayT, maxDayT, minNightT, maxNightT);
+                    t.adapt();
+                    temperaturesList.add(t);
                 }
+
+                Element row0 = tBody0.last();
+                Element row1 = tBody1.last();
+
+                dayIcon = (childNumber <= 9) ? row0.child(caught ? 6 : 5).child(childNumber).text()
+                                             : row1.child(caught ? 6 : 5).child(childNumber % 9).text();
+                nightIcon = ((childNumber + 1) <= 9) ? row0.child(caught ? 6 : 5).child(childNumber + 1).text()
+                                                     : row1.child(caught ? 6 : 5).child((childNumber + 1) % 9).text();
+
+                if (dayIcon != null && nightIcon != null)
+                    try {
+                        iconsList.add(new Icons(dayIcon, nightIcon));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
 
             connections++;
             percentage = (connections * 100 / urls.size());
             FileSaveDialog.progress.setValue((int) percentage);
             domPos = 0;
         }
+        /* end of 'for' loop */
+
         if (failed) {
             Logger logger = Logger.getLogger("WParser errors");
             FileHandler fh;
@@ -208,7 +222,7 @@ public class WeatherParser {
             }
             logger.getHandlers()[0].close();
         }
-        new JsonExporter().save(temperaturesList, iconsList, toFile, cities);
+        new JsonExporter().save(temperaturesList, iconsList, files, cities);
         return failed;
     }
 }

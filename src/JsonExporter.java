@@ -18,13 +18,13 @@ import java.util.List;
 class JsonExporter {
     private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting().create();
-    WthrContainer container = new WthrContainer();
+    WthrContainer container = null;
     private String MAP_FILE = "cities_map.txt";
     private BufferedReader mapReader = new BufferedReader(
         new InputStreamReader(JsonExporter.class.getResourceAsStream(MAP_FILE)));
     private List<String> citiesList = new ArrayList<>();
 
-    void save(List<Temperatures> tList, List<Icons> iList, String toFile, List<String> cities) {
+    void save(List<Temperatures> tList, List<Icons> iList, String[] files, List<String> cities) {
         FileWriter writer = null;
         String ln = null;
         try {
@@ -40,42 +40,49 @@ class JsonExporter {
                 System.err.println("IOE on closing mapReader");
             }
         }
-        try  {
-            writer = new FileWriter(toFile);
-            for (int i = 0; i < tList.size(); i++) {
-                Wthr w = new Wthr();
-                for (int j = 0; j < citiesList.size(); j++)
-                {
-                    String row = citiesList.get(j);
-                    String curCity = row.split(" :")[0];
-                    if (curCity.equals(cities.get(i)))
-                        w.setCity(row.split(": ")[1]);
-                }
-                if (w.getCity() == null)
-                    w.setCity(cities.get(i).toLowerCase());
-                Temperatures curTmp = tList.get(i);
-                w.setDayTemp(curTmp.getDayT());
-                w.setNightTemp(curTmp.getNightT());
+        int tListSz = tList.size();
 
-                Icons curIco = iList.get(i);
-                w.setDayIcon(curIco.getDayIcon());
-                w.setNightIcon(curIco.getNightIcon());
-                container.getWthr().add(w);
-            }
-            GSON.toJson(container, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.flush();
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        for (int j = 0; j < 3; j++) {
+            container = new WthrContainer();
+            try  {
+                writer = new FileWriter(files[j]);
+                // Считаем tList.size() всегда кратным 3, так как берем погоду для 3 следующих дней.
+                for (int i = 0; i < (tListSz / 3); i++) {
+                    Wthr w = new Wthr();
+                    for (int k = 0; k < citiesList.size(); k++)
+                    {
+                        String row = citiesList.get(k);
+                        String curCity = row.split(" :")[0];
+                        if (curCity.equals(cities.get(i)))
+                            w.setCity(row.split(": ")[1]);
+                    }
+                    if (w.getCity() == null)
+                        w.setCity(cities.get(i).toLowerCase());
+                    Temperatures curTmp = tList.get(j + (3 * i));
+                    w.setDayTemp(curTmp.getDayT());
+                    w.setNightTemp(curTmp.getNightT());
 
+                    Icons curIco = iList.get(j + (3 * i));
+                    w.setDayIcon(curIco.getDayIcon());
+                    w.setNightIcon(curIco.getNightIcon());
+                    container.getWthr().add(w);
+                }
+                GSON.toJson(container, writer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.flush();
+                        writer.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
             }
         }
+
     }
 
     JsonExporter() {

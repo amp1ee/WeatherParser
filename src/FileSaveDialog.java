@@ -57,16 +57,9 @@ public class FileSaveDialog  {
         urlsChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         urlsChooser.setFileFilter(new FileNameExtensionFilter(".lst only", "lst"));
 
-        Date dt = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(dt);
-        c.add(Calendar.DATE, 1); //tomorrow date
-        dt = c.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
-        String tomorrow = sdf.format(dt);
+        String[] dates = getDates();
 
-        String defaultName = "weather_"+tomorrow+".json";
-
+        String defaultName = "weather_"+ dates[0] +".json";
         File f = new File(defaultName);
 
         File optionsFile = new File(propFilename);
@@ -99,7 +92,6 @@ public class FileSaveDialog  {
                 }
             });
 
-
             progress.setStringPainted(true);
             progress.setFont(font);
             progress.setPreferredSize( new Dimension (340, 40));
@@ -113,15 +105,21 @@ public class FileSaveDialog  {
             frame.add(progress);
             frame.add(cururl);
             frame.setVisible(true);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         } else {
             System.exit(0);
         }
-
+        String dirToExport = fc.getSelectedFile().getAbsolutePath();
+        dirToExport = dirToExport.substring(0, dirToExport.lastIndexOf('\\') + 1);
+        String[] files = {
+                dirToExport.concat("weather_"+ dates[0] +".json"),
+                dirToExport.concat("weather_"+ dates[1] +".json"),
+                dirToExport.concat("weather_"+ dates[2] +".json")
+        };
         WeatherParser wp = new WeatherParser();
         try {
-            boolean failed = wp.parse(fc.getSelectedFile().getAbsolutePath(),
+            boolean failed = wp.parse(files,
                     urlsChooser.getSelectedFile().getAbsolutePath());
             if (wp.connections >= wp.urls.size()) {
                 frame.setTitle(failed ? "Finished with errors" : "Success");
@@ -139,6 +137,20 @@ public class FileSaveDialog  {
             e.printStackTrace();
         }
 
+    }
+
+    private static String[] getDates() {
+        String[] dates = new String[3];
+        Date dt = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        for (int i = 0; i < 3; i++) { //tomorrow, after tomorrow
+            c.add(Calendar.DATE, 1); //next date
+            dt = c.getTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
+            dates[i] = sdf.format(dt);
+        }
+        return dates;
     }
 
 }
