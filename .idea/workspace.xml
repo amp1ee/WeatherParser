@@ -6,12 +6,8 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ac38f8d2-b0bf-4228-aa0a-02f27a41b53f" name="Default" comment="Test">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/JsoupParser/JsonExporter.class" afterPath="$PROJECT_DIR$/out/production/JsoupParser/JsonExporter.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/JsoupParser/WeatherParser.class" afterPath="$PROJECT_DIR$/out/production/JsoupParser/WeatherParser.class" />
+    <list default="true" id="ac38f8d2-b0bf-4228-aa0a-02f27a41b53f" name="Default" comment="Now parsing weather for 3 days ahead. (fixes needed)">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FileSaveDialog.java" afterPath="$PROJECT_DIR$/src/FileSaveDialog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JsonExporter.java" afterPath="$PROJECT_DIR$/src/JsonExporter.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/WeatherParser.java" afterPath="$PROJECT_DIR$/src/WeatherParser.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -50,25 +46,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WeatherParser.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="WeatherParser.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/WeatherParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="198" column="26" lean-forward="true" selection-start-line="198" selection-start-column="26" selection-end-line="198" selection-end-column="26" />
+            <state relative-caret-position="45">
+              <caret line="122" column="13" lean-forward="true" selection-start-line="122" selection-start-column="13" selection-end-line="122" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1509181239921" expanded="false" signature="4579:5535" ph="..." />
-                <marker date="1509181239921" expanded="false" signature="7653:8069" ph="..." />
+                <element signature="e#10341#10409#0" expanded="false" />
+                <marker date="1509363551676" expanded="true" signature="4401:5370" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JsonExporter.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="JsonExporter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/JsonExporter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="544">
-              <caret line="67" column="47" lean-forward="true" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
+            <state relative-caret-position="952">
+              <caret line="67" column="47" lean-forward="false" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -122,6 +118,7 @@
       <find>Jpro</find>
       <find>system.out</find>
       <find>split[4]</find>
+      <find>temperaturesList</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -156,8 +153,8 @@
         <option value="$PROJECT_DIR$/src/Weather-links5.txt" />
         <option value="$PROJECT_DIR$/src/Icons.java" />
         <option value="$PROJECT_DIR$/src/FileSaveDialog.java" />
-        <option value="$PROJECT_DIR$/src/WeatherParser.java" />
         <option value="$PROJECT_DIR$/src/JsonExporter.java" />
+        <option value="$PROJECT_DIR$/src/WeatherParser.java" />
       </list>
     </option>
   </component>
@@ -168,8 +165,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="207" />
-    <option name="width" value="1665" />
+    <option name="x" value="-7" />
+    <option name="width" value="1073" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -188,9 +185,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="Scratches" />
       <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
@@ -198,6 +195,24 @@
             <path>
               <item name="WeatherParser1_4" type="b2602c69:ProjectViewProjectNode" />
               <item name="WeatherParser1_4" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="WeatherParser1_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="WeatherParser1_4" type="462c0819:PsiDirectoryNode" />
+              <item name="out" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="WeatherParser1_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="WeatherParser1_4" type="462c0819:PsiDirectoryNode" />
+              <item name="out" type="462c0819:PsiDirectoryNode" />
+              <item name="artifacts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="WeatherParser1_4" type="b2602c69:ProjectViewProjectNode" />
+              <item name="WeatherParser1_4" type="462c0819:PsiDirectoryNode" />
+              <item name="out" type="462c0819:PsiDirectoryNode" />
+              <item name="artifacts" type="462c0819:PsiDirectoryNode" />
+              <item name="JsoupParser_jar" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="WeatherParser1_4" type="b2602c69:ProjectViewProjectNode" />
@@ -739,7 +754,8 @@
       <workItem from="1509095873626" duration="11588000" />
       <workItem from="1509128310398" duration="3717000" />
       <workItem from="1509178792682" duration="43000" />
-      <workItem from="1509179458895" duration="1809000" />
+      <workItem from="1509179458895" duration="3483000" />
+      <workItem from="1509360982213" duration="3698000" />
     </task>
     <task id="LOCAL-00001" summary="Some bug fixes&#10;&#10;Done some fixes">
       <created>1498716211814</created>
@@ -874,11 +890,18 @@
       <option name="project" value="LOCAL" />
       <updated>1509095777144</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Now parsing weather for 3 days ahead. (fixes needed)">
+      <created>1509181816027</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1509181816027</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="173154000" />
+    <option name="totallyTimeSpent" value="178526000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -893,11 +916,11 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39429176" sideWeight="0.5052083" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13573702" sideWeight="0.49479166" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36830837" sideWeight="0.49479166" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1234375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1046875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -939,7 +962,8 @@
     <MESSAGE value="Doesn't close automatically if failed anywhere." />
     <MESSAGE value="Increased timeout from 11 to 15 sec." />
     <MESSAGE value="Test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Test" />
+    <MESSAGE value="Now parsing weather for 3 days ahead. (fixes needed)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Now parsing weather for 3 days ahead. (fixes needed)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1048,10 +1072,10 @@
     <entry file="file://$PROJECT_DIR$/weather_30_10_2017.json" />
     <entry file="file://$PROJECT_DIR$/weather_29_10_2017.json" />
     <entry file="file://$PROJECT_DIR$/weather_28_10_2017.json" />
-    <entry file="file://$PROJECT_DIR$/src/Icons.java">
+    <entry file="file://$PROJECT_DIR$/src/forJson/WthrContainer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1003">
-          <caret line="63" column="48" lean-forward="false" selection-start-line="63" selection-start-column="48" selection-end-line="63" selection-end-column="48" />
+        <state relative-caret-position="68">
+          <caret line="8" column="13" lean-forward="false" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -1060,6 +1084,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1326">
           <caret line="87" column="42" lean-forward="false" selection-start-line="87" selection-start-column="42" selection-end-line="87" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Icons.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="63" column="48" lean-forward="false" selection-start-line="63" selection-start-column="48" selection-end-line="63" selection-end-column="48" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/JsonExporter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="952">
+          <caret line="67" column="47" lean-forward="false" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
           <folding />
         </state>
       </provider>
@@ -1080,31 +1120,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/forJson/WthrContainer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="8" column="13" lean-forward="false" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/WeatherParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="198" column="26" lean-forward="true" selection-start-line="198" selection-start-column="26" selection-end-line="198" selection-end-column="26" />
+        <state relative-caret-position="45">
+          <caret line="122" column="13" lean-forward="true" selection-start-line="122" selection-start-column="13" selection-end-line="122" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1509181239921" expanded="false" signature="4579:5535" ph="..." />
-            <marker date="1509181239921" expanded="false" signature="7653:8069" ph="..." />
+            <element signature="e#10341#10409#0" expanded="false" />
+            <marker date="1509363551676" expanded="true" signature="4401:5370" ph="..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/JsonExporter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="67" column="47" lean-forward="true" selection-start-line="67" selection-start-column="47" selection-end-line="67" selection-end-column="47" />
-          <folding />
         </state>
       </provider>
     </entry>
