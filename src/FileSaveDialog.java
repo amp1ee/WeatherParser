@@ -115,7 +115,8 @@ public class FileSaveDialog  {
         String[] files = {
                 dirToExport.concat("weather_"+ dates[0] +".json"),
                 dirToExport.concat("weather_"+ dates[1] +".json"),
-                dirToExport.concat("weather_"+ dates[2] +".json")
+                dirToExport.concat("weather_"+ dates[2] +".json"),
+                dirToExport.concat("weather_"+ dates[3] +".json")
         };
         WeatherParser wp = new WeatherParser();
         try {
@@ -140,11 +141,11 @@ public class FileSaveDialog  {
     }
 
     private static String[] getDates() {
-        String[] dates = new String[3];
+        String[] dates = new String[4];
         Date dt = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(dt);
-        for (int i = 0; i < 3; i++) { //tomorrow, after tomorrow
+        for (int i = 0; i < 4; i++) { //tomorrow, after tomorrow
             c.add(Calendar.DATE, 1); //next date
             dt = c.getTime();
             SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");

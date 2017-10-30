@@ -42,12 +42,12 @@ class JsonExporter {
         }
         int tListSz = tList.size();
 
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 4; j++) {
             container = new WthrContainer();
             try  {
                 writer = new FileWriter(files[j]);
-                // Считаем tList.size() всегда кратным 3, так как берем погоду для 3 следующих дней.
-                for (int i = 0; i < (tListSz / 3); i++) {
+                // Считаем tList.size() всегда кратным 4, так как берем погоду для 4 следующих дней.
+                for (int i = 0; i < (tListSz / 4); i++) {
                     Wthr w = new Wthr();
                     for (int k = 0; k < citiesList.size(); k++)
                     {
@@ -58,11 +58,11 @@ class JsonExporter {
                     }
                     if (w.getCity() == null)
                         w.setCity(cities.get(i).toLowerCase());
-                    Temperatures curTmp = tList.get(j + (3 * i));
+                    Temperatures curTmp = tList.get(j + (4 * i));
                     w.setDayTemp(curTmp.getDayT());
                     w.setNightTemp(curTmp.getNightT());
 
-                    Icons curIco = iList.get(j + (3 * i));
+                    Icons curIco = iList.get(j + (4 * i));
                     w.setDayIcon(curIco.getDayIcon());
                     w.setNightIcon(curIco.getNightIcon());
                     container.getWthr().add(w);

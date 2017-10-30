@@ -140,8 +140,8 @@ class WeatherParser {
                     break;
             }
 
-            /* Завтра, послезавтра, послепослезавтра */
-            for (int i = 0; i < 3; i++) {
+            /* Завтра, послезавтра, послепослезавтра, и еще на один день */
+            for (int i = 0; i < 4; i++) {
                 int childNumber = dayTimeCnt + 3 + (i * 3) + (domPos * 3);                                              /* определяем необходимый номер ячейки в строке таблицы (maxNightT) */
                 addTemps(childNumber, maxTempRows0, maxTempRows1, minTempRows0, minTempRows1, caught);
                 addIcons(childNumber, tBody0, tBody1, caught);
