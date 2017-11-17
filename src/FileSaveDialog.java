@@ -13,12 +13,12 @@ public class FileSaveDialog  {
     public static JLabel cururl;
     public static JProgressBar progress = new JProgressBar();
     private static JFrame frame;
-    private static final String propFilename = System.getProperty("user.home") + "/wparser_dir.prop";
+    private static final String propFilename = System.getProperty("user.home") + "/.wparser";
 
     private static void storeDir(String outPath, String inPath) {
         Properties p = new Properties();
         outPath = outPath.substring(0, outPath.lastIndexOf(File.separator)); //path without fileName
-        p.setProperty("lastDir", outPath + "\\");
+        p.setProperty("lastDir", outPath + File.separator);
         p.setProperty("urlDir", inPath);
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propFilename))){
