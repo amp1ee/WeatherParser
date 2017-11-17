@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by djamp on 28.06.2017.
+ *  To get all possible weather conditions from the site.
  */
-public class SummariesGetter {
+class SummariesGetter {
 
     private List<String> urls = new ArrayList<>();
     Set<String> getAllSummaries(String FILE_NAME) throws IOException {

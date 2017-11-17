@@ -14,7 +14,4 @@ public class WthrContainer {
         return wthrList;
     }
 
-    public void setWthrList(List<Wthr> wthrList) {
-        this.wthrList = wthrList;
-    }
 }

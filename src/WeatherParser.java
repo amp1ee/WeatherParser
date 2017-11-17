@@ -50,7 +50,7 @@ class WeatherParser {
 
             String[] split = url.split("/");
             String cityFromUrl = split.length > 4 ? split[4] : url;
-            FileSaveDialog.cururl.setText(cityFromUrl);
+            FileSaveDialog.curUrl.setText(cityFromUrl);
             cities.add(cityFromUrl);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<?> future = executor.submit(() -> {
@@ -83,12 +83,9 @@ class WeatherParser {
 
             Elements daysOfMonth0 = forecast0.getElementsByClass("dom")
                     .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
-            Elements daysOfMonth1 = forecast1.getElementsByClass("dom")
-                    .first().getElementsByClass("dom"); //число месяца в таблице на первом месте
             Elements tBody0 = forecast0.getElementsByTag("tbody");
             Elements tBody1 = forecast1.getElementsByTag("tbody");
             Elements dayTime0;
-            Elements dayTime1;
             try {
                 dayTime0 = forecast0.getElementsByClass("pname")
                         .first().getElementsByClass("pname"); //название времени суток в таблице на первом месте

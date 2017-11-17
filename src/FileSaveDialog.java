@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Properties;
 
 public class FileSaveDialog  {
-    static JLabel cururl;
+    static JLabel curUrl;
     static JProgressBar progress = new JProgressBar();
     private static String slash = File.separator;
     private static JFrame frame;
@@ -98,13 +98,13 @@ public class FileSaveDialog  {
             progress.setPreferredSize( new Dimension (340, 40));
             progress.setForeground(Color.BLACK);
 
-            cururl = new JLabel("");
-            cururl.setVerticalAlignment(JLabel.BOTTOM);
-            cururl.setFont(new Font("Sans-serif", Font.BOLD, 14));
-            cururl.setVisible(true);
+            curUrl = new JLabel("");
+            curUrl.setVerticalAlignment(JLabel.BOTTOM);
+            curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
+            curUrl.setVisible(true);
 
             frame.add(progress);
-            frame.add(cururl);
+            frame.add(curUrl);
             frame.setVisible(true);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -125,7 +125,7 @@ public class FileSaveDialog  {
                     urlsChooser.getSelectedFile().getAbsolutePath());
             if (wp.connections >= wp.urls.size()) {
                 frame.setTitle(failed ? "Finished with errors" : "Success");
-                cururl.setText(failed ? "Finished with errors (see log file)." : "Parsing finished successfully!");
+                curUrl.setText(failed ? "Finished with errors (see log file)." : "Parsing finished successfully!");
 
                 try {
                     Thread.sleep(2000);

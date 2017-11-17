@@ -1,6 +1,5 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import forJson.Deserializator;
 import forJson.WthrContainer;
 import forJson.Wthr;
 
@@ -12,13 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * export
+ * Export to .json
  */
 
 class JsonExporter {
     private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
             .setPrettyPrinting().create();
-    WthrContainer container = null;
     private String MAP_FILE = "cities_map.txt";
     private BufferedReader mapReader = new BufferedReader(
         new InputStreamReader(JsonExporter.class.getResourceAsStream(MAP_FILE)));
@@ -26,7 +24,7 @@ class JsonExporter {
 
     void save(List<Temperatures> tList, List<Icons> iList, String[] files, List<String> cities) {
         FileWriter writer = null;
-        String ln = null;
+        String ln;
         try {
             while ((ln = mapReader.readLine()) != null) {
                 citiesList.add(ln);
@@ -43,15 +41,13 @@ class JsonExporter {
         int tListSz = tList.size();
 
         for (int j = 0; j < 4; j++) {
-            container = new WthrContainer();
+            WthrContainer container = new WthrContainer();
             try  {
                 writer = new FileWriter(files[j]);
                 // Считаем tList.size() всегда кратным 4, так как берем погоду для 4 следующих дней.
                 for (int i = 0; i < (tListSz / 4); i++) {
                     Wthr w = new Wthr();
-                    for (int k = 0; k < citiesList.size(); k++)
-                    {
-                        String row = citiesList.get(k);
+                    for (String row : citiesList) {
                         String curCity = row.split(" :")[0];
                         if (curCity.equals(cities.get(i)))
                             w.setCity(row.split(": ")[1]);
