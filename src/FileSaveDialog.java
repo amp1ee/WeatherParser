@@ -10,15 +10,16 @@ import java.util.Date;
 import java.util.Properties;
 
 public class FileSaveDialog  {
-    public static JLabel cururl;
-    public static JProgressBar progress = new JProgressBar();
+    static JLabel cururl;
+    static JProgressBar progress = new JProgressBar();
+    private static String slash = File.separator;
     private static JFrame frame;
-    private static final String propFilename = System.getProperty("user.home") + "/.wparser";
+    private static final String propFilename = System.getProperty("user.home") + slash + ".wparser";
 
     private static void storeDir(String outPath, String inPath) {
         Properties p = new Properties();
-        outPath = outPath.substring(0, outPath.lastIndexOf(File.separator)); //path without fileName
-        p.setProperty("lastDir", outPath + File.separator);
+        outPath = outPath.substring(0, outPath.lastIndexOf(slash)); //path without fileName
+        p.setProperty("lastDir", outPath + slash);
         p.setProperty("urlDir", inPath);
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propFilename))){
