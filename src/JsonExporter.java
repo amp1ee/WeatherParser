@@ -25,6 +25,7 @@ class JsonExporter {
     void save(List<Temperatures> tList, List<Icons> iList, String[] files, List<String> cities) {
         FileWriter writer = null;
         String ln;
+        int amt = files.length;
         try {
             while ((ln = mapReader.readLine()) != null) {
                 citiesList.add(ln);
@@ -40,12 +41,11 @@ class JsonExporter {
         }
         int tListSz = tList.size();
 
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j < amt; j++) {
             WthrContainer container = new WthrContainer();
             try  {
                 writer = new FileWriter(files[j]);
-                // Считаем tList.size() всегда кратным 4, так как берем погоду для 4 следующих дней.
-                for (int i = 0; i < (tListSz / 4); i++) {
+                for (int i = 0; i < (tListSz / amt); i++) {
                     Wthr w = new Wthr();
                     for (String row : citiesList) {
                         String curCity = row.split(" :")[0];
@@ -54,11 +54,11 @@ class JsonExporter {
                     }
                     if (w.getCity() == null)
                         w.setCity(cities.get(i).toLowerCase());
-                    Temperatures curTmp = tList.get(j + (4 * i));
+                    Temperatures curTmp = tList.get(j + (amt * i));
                     w.setDayTemp(curTmp.getDayT());
                     w.setNightTemp(curTmp.getNightT());
 
-                    Icons curIco = iList.get(j + (4 * i));
+                    Icons curIco = iList.get(j + (amt * i));
                     w.setDayIcon(curIco.getDayIcon());
                     w.setNightIcon(curIco.getNightIcon());
                     container.getWthr().add(w);
@@ -74,7 +74,6 @@ class JsonExporter {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             }
         }

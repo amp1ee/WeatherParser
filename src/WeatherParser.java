@@ -29,7 +29,7 @@ class WeatherParser {
         Elements minTempRows = null;
         Element date; //число месяца в таблице на первом месте
         Element time = null;
-
+        int amt = files.length;
         Calendar cal = Calendar.getInstance();
         int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
         String curDay = String.valueOf(dayOfMonth);
@@ -71,7 +71,7 @@ class WeatherParser {
             });
             executor.shutdown();
             try {
-                future.get(3, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
+                future.get(10, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
             } catch (InterruptedException e) {    //     <-- possible error cases
                 System.out.println("job was interrupted");
             } catch (ExecutionException e) {
@@ -121,7 +121,7 @@ class WeatherParser {
                     break;
             }
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < amt; i++) {
                 int childNumber = dayTimeCnt + 3 + (i * 3) + (domPos * 3);                                              /* определяем необходимый номер ячейки в строке таблицы (maxNightT) */
                 addTemps(childNumber, maxTempRows, minTempRows);
                 addIcons(childNumber, tBody.getElementsByClass(mainClass + "-summary").first());

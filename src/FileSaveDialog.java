@@ -58,11 +58,15 @@ public class FileSaveDialog  {
         urlsChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         urlsChooser.setFileFilter(new FileNameExtensionFilter(".lst only", "lst"));
 
-        String[] dates = getDates();
-
+        int amt;
+        if (args.length != 0)
+            amt = Integer.parseInt(args[0]);
+        else
+            amt = 8;
+        amt = (amt > 0 && amt <= 8) ? amt : 8;
+        String[] dates = getDates(amt);
         String defaultName = "weather_"+ dates[0] +".json";
         File f = new File(defaultName);
-
         File optionsFile = new File(propFilename);
         if (optionsFile.exists()) {
             restoreDir(fc, defaultName, urlsChooser);
@@ -111,14 +115,9 @@ public class FileSaveDialog  {
         } else {
             System.exit(0);
         }
-        String dirToExport = fc.getSelectedFile().getAbsolutePath();
-        dirToExport = dirToExport.substring(0, dirToExport.lastIndexOf('\\') + 1);
-        String[] files = {
-                dirToExport.concat("weather_"+ dates[0] +".json"),
-                dirToExport.concat("weather_"+ dates[1] +".json"),
-                dirToExport.concat("weather_"+ dates[2] +".json"),
-                dirToExport.concat("weather_"+ dates[3] +".json")
-        };
+        String exportDir = fc.getSelectedFile().getAbsolutePath();
+        exportDir = exportDir.substring(0, exportDir.lastIndexOf(slash) + 1);
+        String[] files = getFileNames(exportDir, dates);
         WeatherParser wp = new WeatherParser();
         try {
             boolean failed = wp.parse(files,
@@ -141,12 +140,13 @@ public class FileSaveDialog  {
 
     }
 
-    private static String[] getDates() {
-        String[] dates = new String[4];
+    private static String[] getDates(int amt) {
+        String[] dates = new String[amt];
         Date dt = new Date();
         Calendar c = Calendar.getInstance();
+
         c.setTime(dt);
-        for (int i = 0; i < 4; i++) { //tomorrow, after tomorrow
+        for (int i = 0; i < amt; i++) { //tomorrow, after tomorrow, and so on
             c.add(Calendar.DATE, 1); //next date
             dt = c.getTime();
             SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
@@ -155,4 +155,12 @@ public class FileSaveDialog  {
         return dates;
     }
 
+    private static String[] getFileNames(String exportDir, String[] dates) {
+        int amt = dates.length;
+        String[] names = new String[amt];
+        for (int i = 0; i < amt; i++) {
+            names[i] = exportDir.concat("weather_"+ dates[i] +".json");
+        }
+        return names;
+    }
 }
