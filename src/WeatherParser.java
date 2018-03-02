@@ -2,6 +2,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
@@ -18,18 +20,19 @@ class WeatherParser {
     private Document                doc;
     private List<Temperatures>      temperaturesList;
     private List<Icons>             iconsList;
-    private final String            mainClass = "b-forecast__table";
 
-    boolean parse(String[] files, String urls_lst) throws IOException {
-        Elements dayTime;
+    boolean parse(String[] files, JFrame mainframe, String urls_lst) throws IOException {
         Element table;
-        Element tBody = null;
+        Element tBody;
         Element tHead;
-        Elements maxTempRows = null;
-        Elements minTempRows = null;
+        Elements maxTempRows;
+        Elements minTempRows;
         Element date; //число месяца в таблице на первом месте
-        Element time = null;
+        Element time;
         int amt = files.length;
+        Exception exception;
+
+        String mainClass = "b-forecast__table";
         Calendar cal = Calendar.getInstance();
         int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);// the day of month
         String curDay = String.valueOf(dayOfMonth);
@@ -70,39 +73,45 @@ class WeatherParser {
                 }
             });
             executor.shutdown();
+            exception = null;
             try {
                 future.get(10, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
-            } catch (InterruptedException e) {    //     <-- possible error cases
-                System.out.println("job was interrupted");
+            } catch (InterruptedException e) {
+                exception = e;//     <-- possible error cases
+                System.out.println("Thread future.get() was interrupted");
             } catch (ExecutionException e) {
-                System.out.println("caught exception: " + e.getCause());
+                exception = e;
+                System.out.println("Caught " + e.getCause());
             } catch (TimeoutException e) {
+                exception = e;
                 future.cancel(true);              //     <-- interrupt the job
                 failed = true;
                 failList.add("TIMEOUT - " + url);
+            } finally {
+                if (exception != null)
+                    JOptionPane.showMessageDialog(mainframe, exception.getCause(), mainframe.getTitle()
+                            + " " + exception.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
             }
-
             try {
                 table = doc.getElementsByClass(mainClass).first(); // 1-я таблица
                 tBody = table.getElementsByTag("tbody").first();
                 tHead = table.getElementsByTag("thead").first();
                 maxTempRows = tBody.getElementsByClass(mainClass + "-max-temperature");
                 minTempRows = tBody.getElementsByClass(mainClass + "-min-temperature");
-                date = tHead.getElementsByClass(mainClass + "-days-date").first(); //число месяца в таблице на первом месте
+                date = tHead.getElementsByClass(mainClass + "-days-date").first();
                 time = tHead.getElementsByClass(mainClass + "-value").first();
             } catch (IndexOutOfBoundsException iobe) {
-                failed = true;
                 failList.add("PARSE ERROR - " + url);
                 iobe.printStackTrace();
                 return false;
             }
-            //смотрим позицию сегодняшней колонки в таблице
+            // Determining the position of our current local month date in the weather-table
             String day = date.text();
             if (day.equals(curDay)) {
                 domPos = 0;
             } else if (!day.equalsIgnoreCase(curDay))
                 domPos = 1;
-            //смотрим первый элемент с временем суток в таблице
+            // Identifying the first cell of the table's daytime ("AM" / "PM" / "Night") row;
             String timeS;
             if (time != null)
                 timeS = time.text();

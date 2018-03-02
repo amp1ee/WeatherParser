@@ -13,7 +13,7 @@ public class FileSaveDialog  {
     static JLabel curUrl;
     static JProgressBar progress = new JProgressBar();
     private static String slash = File.separator;
-    private static JFrame frame;
+    private static JFrame mainframe;
     private static final String propFilename = System.getProperty("user.home") + slash + ".wparser";
 
     private static void storeDir(String outPath, String inPath) {
@@ -78,14 +78,14 @@ public class FileSaveDialog  {
                 fc.showSaveDialog(save) == JFileChooser.APPROVE_OPTION) {
             //
             Font font = new Font("Sans-serif", Font.PLAIN, 18);
-            frame = new JFrame();
-            frame.setSize(350,100);
-            frame.setResizable(false);
-            frame.setLocationRelativeTo(null);
-            frame.setTitle("Parsing weather-forecast.com...");
-            frame.setLayout(new FlowLayout());
+            mainframe = new JFrame();
+            mainframe.setSize(350,100);
+            mainframe.setResizable(false);
+            mainframe.setLocationRelativeTo(null);
+            mainframe.setTitle("Parsing weather-forecast.com...");
+            mainframe.setLayout(new FlowLayout());
 
-            frame.addWindowListener( new WindowAdapter() {
+            mainframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent we) {
                     try {
                         storeDir(fc.getSelectedFile().getAbsolutePath(),
@@ -107,10 +107,10 @@ public class FileSaveDialog  {
             curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
             curUrl.setVisible(true);
 
-            frame.add(progress);
-            frame.add(curUrl);
-            frame.setVisible(true);
-            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            mainframe.add(progress);
+            mainframe.add(curUrl);
+            mainframe.setVisible(true);
+            mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         } else {
             System.exit(0);
@@ -120,10 +120,10 @@ public class FileSaveDialog  {
         String[] files = getFileNames(exportDir, dates);
         WeatherParser wp = new WeatherParser();
         try {
-            boolean failed = wp.parse(files,
+            boolean failed = wp.parse(files, mainframe,
                     urlsChooser.getSelectedFile().getAbsolutePath());
             if (wp.connections >= wp.urls.size()) {
-                frame.setTitle(failed ? "Finished with errors" : "Success");
+                mainframe.setTitle(failed ? "Finished with errors" : "Success");
                 curUrl.setText(failed ? "Finished with errors (see log file)." : "Parsing finished successfully!");
 
                 try {
@@ -132,7 +132,7 @@ public class FileSaveDialog  {
                     e.printStackTrace();
                 }
                 if (!failed)
-                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                    mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));
             }
         } catch (IOException e) {
             e.printStackTrace();
