@@ -17,19 +17,8 @@ import java.util.Set;
  */
 class SummariesGetter {
 
-    private List<String> urls = new ArrayList<>();
-    Set<String> getAllSummaries(String FILE_NAME) throws IOException {
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream(FILE_NAME)));
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            urls.add(line);
-        }
-
-
+    Set<String> getAllSummaries(ArrayList<String> urls) throws IOException {
+        String      mainClass = "b-forecast__table";
         List<Document> docs = new ArrayList<>();
 
         //connecting to cities' latest weather links and getting 'Document' entities;
@@ -42,13 +31,13 @@ class SummariesGetter {
 
 
         for (Document doc : docs) {
-            elemsList.add(doc.getElementsByClass("wphrase"));
+            elemsList.add(doc.getElementsByClass( mainClass + "-summary"));
 
         }
 
         for (Elements elems : elemsList) {
             for (Element element : elems) {
-                summaries.add(element.getElementsByTag("b").text());
+                summaries.add(element.getElementsByTag("td").text());
             }
         }
 
