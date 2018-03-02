@@ -82,7 +82,7 @@ public class FileSaveDialog  {
             mainframe.setSize(350,100);
             mainframe.setResizable(false);
             mainframe.setLocationRelativeTo(null);
-            mainframe.setTitle("Parsing weather-forecast.com...");
+            mainframe.setTitle("wParser 1.5");
             mainframe.setLayout(new FlowLayout());
 
             mainframe.addWindowListener(new WindowAdapter() {
