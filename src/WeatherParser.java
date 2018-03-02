@@ -21,82 +21,82 @@ class WeatherParser {
     private Document                doc;
     private List<Temperatures>      temperaturesList;
     private List<Icons>             iconsList;
+    private List<String>            cities;
+    private List<String>            failList;
+    private Element                 tBody = null;
+    private Elements                maxTempRows = null;
+    private Elements                minTempRows = null;
+    private Element                 date = null;
+    private Element                 time = null;
+    private static final String     mainClass = "b-forecast__table";
+    private JFrame                  mainframe;
 
     boolean parse(String[] files, JFrame mainframe, String urls_lst) throws IOException {
-        Element     table;
-        Element     tBody = null;
-        Element     tHead;
-        Elements    maxTempRows = null;
-        Elements    minTempRows = null;
-        Element     date = null;
-        Element     time = null;
         int         amt = files.length;
-        Exception   exception;
-        String      mainClass = "b-forecast__table";
+        boolean     success;
+
+        // new Icons(urls_lst).print(); // If you want to get the list of all summaries (Summary) from the site
+        connections = 0;
+        iconsList = new ArrayList<>();
+        temperaturesList = new ArrayList<>();
+        this.mainframe = mainframe;
+        urls = getUrlsList(urls_lst);
+        success = processUrls(urls, amt);
+        if (!success)
+            writeLog();
+        exportToJSON(files);
+        return success;
+    }
+
+    private ArrayList<String> getUrlsList(String urls_lst) {
+        ArrayList<String>   urls = new ArrayList<>();
+        String              line;
+        BufferedReader      reader = null;
+
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(urls_lst)));
+            while ((line = reader.readLine()) != null)
+                urls.add(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return urls;
+    }
+
+    private boolean processUrls(List<String> urls, int amt) {
+        boolean     success = true;
+        int         domPos = 0;
         Calendar    cal = Calendar.getInstance();
         int         dayOfMonth = cal.get(Calendar.DAY_OF_MONTH); // the day of month
         String      curDay = String.valueOf(dayOfMonth);
+        String[]    split;
+        String      cityFromUrl;
 
         if (Integer.parseInt(curDay) < 10)
             curDay = "0" + curDay;
-        // new Icons(urls_lst).print(); // get the list of all summaries (Summary) from the site
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(urls_lst)));
-        String line;
-
-        urls = new ArrayList<>();
-        while ((line = reader.readLine()) != null)
-            urls.add(line);
-        reader.close();
-
-        boolean success         = true;
-        List<String> failList   = new ArrayList<>();
+        cities = new ArrayList<>();
+        failList = new ArrayList<>();
 
         //connecting to cities' latest weather links and getting 'Document' entities;
-        connections = 0;
-        int domPos = 0; // Позиция текущего числа месяца в таблице
-        List<String> cities = new ArrayList<>();
-        iconsList = new ArrayList<>();
-        temperaturesList = new ArrayList<>();
         for (String url : urls) {
-
-            String[] split = url.split("/");
-            String cityFromUrl = split.length > 4 ? split[4] : url;
+            split = url.split("/");
+            cityFromUrl = split.length > 4 ? split[4] : url;
             FileSaveDialog.curUrl.setText(cityFromUrl);
             cities.add(cityFromUrl);
-            ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<?> future = executor.submit(() -> {
-                try {
-                    doc = Jsoup.connect(url).get();
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            });
-            executor.shutdown();
-            exception = null;
+            success = connectToUrl(url);
             try {
-                future.get(10, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
-            } catch (InterruptedException e) {
-                exception = e;//     <-- possible error cases
-                System.out.println("Thread future.get() was interrupted");
-            } catch (ExecutionException e) {
-                exception = e;
-                failList.add("ERROR - " + e.getCause());
-            } catch (TimeoutException e) {
-                exception = e;
-                future.cancel(true);              //     <-- interrupt the job
-                failList.add("TIMEOUT - " + url);
-            } finally {
-                if (exception != null) {
-                    JOptionPane.showMessageDialog(mainframe, exception.getCause(), mainframe.getTitle()
-                            + " - " + exception.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
-                    success = false;
-                }
-            }
-            try {
-                table = doc.getElementsByClass(mainClass).first(); // 1-я таблица
+                Element table = doc.getElementsByClass(mainClass).first();
                 tBody = table.getElementsByTag("tbody").first();
-                tHead = table.getElementsByTag("thead").first();
+                Element tHead = table.getElementsByTag("thead").first();
                 maxTempRows = tBody.getElementsByClass(mainClass + "-max-temperature");
                 minTempRows = tBody.getElementsByClass(mainClass + "-min-temperature");
                 date = tHead.getElementsByClass(mainClass + "-days-date").first();
@@ -113,7 +113,7 @@ class WeatherParser {
                 day = date.text();
                 if (day.equals(curDay)) {
                     domPos = 0;
-                } else if (!day.equalsIgnoreCase(curDay))
+                } else if (!day.equals(curDay))
                     domPos = 1;
             }
             else
@@ -126,8 +126,9 @@ class WeatherParser {
                 timeStr = time.text();
             else
                 success = false;
-            int dayTimeCnt;
             if (timeStr != null) {
+                int dayTimeCnt;
+
                 switch (timeStr) {
                     case "AM":
                         dayTimeCnt = 2;
@@ -147,37 +148,74 @@ class WeatherParser {
             }
             else
                 success = false;
-
             connections++;
             float percentage = (connections * 100 / urls.size());
             FileSaveDialog.progress.setValue((int) percentage);
             domPos = 0;
         }
         /* end of 'for' loop */
+        return success;
+    }
 
-        if (!success) {
-            Logger logger = Logger.getLogger("wParser errors");
-            FileHandler fh;
+    private void writeLog() throws IOException {
+        Logger logger = Logger.getLogger("wParser errors");
+        FileHandler fh;
+        try {
+            String location = FileSaveDialog.class.getProtectionDomain().getCodeSource()
+                    .getLocation().toURI().getPath();
+            fh = new FileHandler(location + File.separator + "events.log", true);
+            fh.setFormatter(new LogFormatter());
+            logger.addHandler(fh);
+        } catch (URISyntaxException | NoSuchFileException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < failList.size(); i++) {
+            logger.log(Level.SEVERE,failList.get(i) + System.lineSeparator());
+            i++;
+        }
+        try {
+            logger.getHandlers()[0].close();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void exportToJSON(String[] files) {
+        new JsonExporter().save(temperaturesList, iconsList, files, cities);
+    }
+
+    private boolean connectToUrl(String url) {
+        Exception           exception;
+        boolean             success = true;
+        ExecutorService     executor = Executors.newSingleThreadExecutor();
+        Future<?>           future = executor.submit(() -> {
             try {
-                String location = FileSaveDialog.class.getProtectionDomain().getCodeSource()
-                        .getLocation().toURI().getPath();
-                fh = new FileHandler(location + File.separator + "events.log", true);
-                fh.setFormatter(new LogFormatter());
-                logger.addHandler(fh);
-            } catch (URISyntaxException | NoSuchFileException e) {
-                e.printStackTrace();
+                doc = Jsoup.connect(url).get();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
-            for (int i = 0; i < failList.size(); i++) {
-                logger.log(Level.SEVERE,failList.get(i) + System.lineSeparator());
-                i++;
-            }
-            try {
-                logger.getHandlers()[0].close();
-            } catch (ArrayIndexOutOfBoundsException e) {
-                e.printStackTrace();
+        });
+        executor.shutdown();
+        exception = null;
+        try {
+            future.get(10, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
+        } catch (InterruptedException e) {
+            exception = e;//     <-- possible error cases
+            System.out.println("Thread future.get() was interrupted");
+        } catch (ExecutionException e) {
+            exception = e;
+            failList.add("ERROR - " + e.getCause());
+        } catch (TimeoutException e) {
+            exception = e;
+            future.cancel(true);              //     <-- interrupt the job
+            failList.add("TIMEOUT - " + url);
+        } finally {
+            if (exception != null) {
+                JOptionPane.showMessageDialog(mainframe, exception.getCause(), mainframe.getTitle()
+                        + " - " + exception.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+                success = false;
             }
         }
-        new JsonExporter().save(temperaturesList, iconsList, files, cities);
         return success;
     }
 

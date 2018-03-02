@@ -90,7 +90,7 @@ class Icons {
                 System.out.println(s);
             }
         else {
-            System.out.println("empty summaries");
+            System.out.println("Empty summaries...");
         }
     }
 
