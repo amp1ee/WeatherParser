@@ -138,7 +138,7 @@ public class FileSaveDialog {
                     urlsChooser.getSelectedFile().getAbsolutePath());
             if (wp.connections >= wp.urls.size()) {
                 mainframe.setTitle(!(success) ? "Finished with errors" : "Success");
-                curUrl.setText(!(success) ? "Finished with errors (see log file)." : "Parsing finished");
+                curUrl.setText(!(success) ? "Finished with errors (see log file in the working dir)." : "Parsing finished");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {

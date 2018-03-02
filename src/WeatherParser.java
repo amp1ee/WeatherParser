@@ -36,7 +36,6 @@ class WeatherParser {
         int         amt = files.length;
         boolean     success;
 
-        // new Icons(urls_lst).print(); // If you want to get the list of all summaries (Summary) from the site
         connections = 0;
         iconsList = new ArrayList<>();
         failList = new ArrayList<>();
