@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.nio.file.NoSuchFileException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,48 +32,40 @@ class WeatherParser {
     private static final String     mainClass = "b-forecast__table";
     private JFrame                  mainframe;
 
-    boolean parse(String[] files, JFrame mainframe, String urls_lst) throws IOException {
+    boolean                     parse(String[] files, JFrame mainframe, String urls_lst) throws IOException {
         int         amt = files.length;
         boolean     success;
 
         // new Icons(urls_lst).print(); // If you want to get the list of all summaries (Summary) from the site
         connections = 0;
         iconsList = new ArrayList<>();
+        failList = new ArrayList<>();
         temperaturesList = new ArrayList<>();
         this.mainframe = mainframe;
         urls = getUrlsList(urls_lst);
         success = processUrls(urls, amt);
-        if (!success)
+        if (!success) {
             writeLog();
+        }
         exportToJSON(files);
         return success;
     }
 
-    private ArrayList<String> getUrlsList(String urls_lst) {
+    private ArrayList<String>   getUrlsList(String urls_lst) {
         ArrayList<String>   urls = new ArrayList<>();
         String              line;
-        BufferedReader      reader = null;
 
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(urls_lst)));
-            while ((line = reader.readLine()) != null)
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(urls_lst)))) {
+             while ((line = reader.readLine()) != null)
                 urls.add(line);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         return urls;
     }
 
-    private boolean processUrls(List<String> urls, int amt) {
+    private boolean             processUrls(List<String> urls, int amt) {
         boolean     success = true;
         int         domPos = 0;
         Calendar    cal = Calendar.getInstance();
@@ -84,15 +77,15 @@ class WeatherParser {
         if (Integer.parseInt(curDay) < 10)
             curDay = "0" + curDay;
         cities = new ArrayList<>();
-        failList = new ArrayList<>();
 
-        //connecting to cities' latest weather links and getting 'Document' entities;
+        // Connecting to cities' latest weather links and getting 'Document' entities;
         for (String url : urls) {
             split = url.split("/");
             cityFromUrl = split.length > 4 ? split[4] : url;
             FileSaveDialog.curUrl.setText(cityFromUrl);
             cities.add(cityFromUrl);
-            success = connectToUrl(url);
+            if (!(connectToUrl(url)))
+                success = false;
             try {
                 Element table = doc.getElementsByClass(mainClass).first();
                 tBody = table.getElementsByTag("tbody").first();
@@ -157,16 +150,19 @@ class WeatherParser {
         return success;
     }
 
-    private void writeLog() throws IOException {
-        Logger logger = Logger.getLogger("wParser errors");
-        FileHandler fh;
+    private void                writeLog() throws IOException {
+        Logger          logger = Logger.getLogger("wParser errors");
+        FileHandler     fh;
+        String          location;
+
         try {
-            String location = FileSaveDialog.class.getProtectionDomain().getCodeSource()
-                    .getLocation().toURI().getPath();
-            fh = new FileHandler(location + File.separator + "events.log", true);
+            location = URLDecoder.decode(FileSaveDialog.class.getProtectionDomain()
+                .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
+            location = location.substring(0, location.lastIndexOf(File.separator));
+            fh = new FileHandler(location + File.separator + "wparser.log", true);
             fh.setFormatter(new LogFormatter());
             logger.addHandler(fh);
-        } catch (URISyntaxException | NoSuchFileException e) {
+        } catch (NullPointerException | URISyntaxException | NoSuchFileException e) {
             e.printStackTrace();
         }
         for (int i = 0; i < failList.size(); i++) {
@@ -180,13 +176,13 @@ class WeatherParser {
         }
     }
 
-    private void exportToJSON(String[] files) {
+    private void                exportToJSON(String[] files) {
         new JsonExporter().save(temperaturesList, iconsList, files, cities);
     }
 
-    private boolean connectToUrl(String url) {
+    private boolean             connectToUrl(String url) {
         Exception           exception;
-        boolean             success = true;
+        final int           timeout = 10;
         ExecutorService     executor = Executors.newSingleThreadExecutor();
         Future<?>           future = executor.submit(() -> {
             try {
@@ -198,7 +194,7 @@ class WeatherParser {
         executor.shutdown();
         exception = null;
         try {
-            future.get(10, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
+            future.get(timeout, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
         } catch (InterruptedException e) {
             exception = e;//     <-- possible error cases
             System.out.println("Thread future.get() was interrupted");
@@ -213,13 +209,12 @@ class WeatherParser {
             if (exception != null) {
                 JOptionPane.showMessageDialog(mainframe, exception.getCause(), mainframe.getTitle()
                         + " - " + exception.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
-                success = false;
             }
         }
-        return success;
+        return (exception == null);
     }
 
-    private void addIcons(int childNumber, Element summary) {
+    private void                addIcons(int childNumber, Element summary) {
         String dayIcon;
         String nightIcon;
         Elements row = summary.getElementsByTag("td");
@@ -230,7 +225,7 @@ class WeatherParser {
             iconsList.add(new Icons(dayIcon, nightIcon));
     }
 
-    private void addTemps(int childNumber, Elements maxTempRows, Elements minTempRows) {
+    private void                addTemps(int childNumber, Elements maxTempRows, Elements minTempRows) {
         String maxDayT;
         String minDayT;
         String maxNightT;
@@ -254,7 +249,7 @@ class WeatherParser {
 
 class LogFormatter extends Formatter {
     // Create a DateFormat to format the logger timestamp.
-    private static final DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+    private static final DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     public String format(LogRecord record) {
         StringBuilder builder = new StringBuilder(1000);
