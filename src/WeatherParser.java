@@ -179,6 +179,10 @@ class WeatherParser {
         new JsonExporter().save(temperaturesList, iconsList, files, cities);
     }
 
+    private String getErrMessage(Exception e) {
+        return ("wParser - " + e.getClass().getSimpleName());
+    }
+
     private boolean             connectToUrl(String url) {
         Exception           exception;
         final int           timeout = 10;
@@ -187,7 +191,9 @@ class WeatherParser {
             try {
                 doc = Jsoup.connect(url).get();
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                JOptionPane.showMessageDialog(mainframe, ioe,
+                getErrMessage(ioe),
+                JOptionPane.ERROR_MESSAGE);
             }
         });
         executor.shutdown();
@@ -206,8 +212,8 @@ class WeatherParser {
             failList.add("TIMEOUT - " + url);
         } finally {
             if (exception != null) {
-                JOptionPane.showMessageDialog(mainframe, exception.getCause(), mainframe.getTitle()
-                        + " - " + exception.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(mainframe, exception,
+                        getErrMessage(exception), JOptionPane.ERROR_MESSAGE);
             }
         }
         return (exception == null);
