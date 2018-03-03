@@ -1,4 +1,4 @@
-package forJson;
+package weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,12 +6,12 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WthrContainer {
+public class WeatherContainer {
     @SerializedName("weather")
     @Expose
-    private List<Wthr> wthrList = new ArrayList<>();
-    public List<Wthr> getWthr() {
-        return wthrList;
+    private List<Weather> weatherList = new ArrayList<>();
+    public List<Weather> getWeather() {
+        return weatherList;
     }
 
 }

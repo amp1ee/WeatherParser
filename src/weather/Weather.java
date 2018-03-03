@@ -1,9 +1,9 @@
-package forJson;
+package weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Wthr {
+public class Weather {
     @SerializedName("reg")
     @Expose
     private String city;

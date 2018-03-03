@@ -1,7 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import forJson.WthrContainer;
-import forJson.Wthr;
+import weather.WeatherContainer;
+import weather.Weather;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -42,11 +42,11 @@ class JsonExporter {
         int tListSz = tList.size();
 
         for (int j = 0; j < amt; j++) {
-            WthrContainer container = new WthrContainer();
+            WeatherContainer container = new WeatherContainer();
             try  {
                 writer = new FileWriter(files[j]);
                 for (int i = 0; i < (tListSz / amt); i++) {
-                    Wthr w = new Wthr();
+                    Weather w = new Weather();
                     for (String row : citiesList) {
                         String curCity = row.split(" :")[0];
                         if (curCity.equals(cities.get(i)))
@@ -61,7 +61,7 @@ class JsonExporter {
                     Icons curIco = iList.get(j + (amt * i));
                     w.setDayIcon(curIco.getDayIcon());
                     w.setNightIcon(curIco.getNightIcon());
-                    container.getWthr().add(w);
+                    container.getWeather().add(w);
                 }
                 GSON.toJson(container, writer);
             } catch (IOException e) {
