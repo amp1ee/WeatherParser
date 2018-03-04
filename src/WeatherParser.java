@@ -3,7 +3,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -29,10 +28,15 @@ class WeatherParser {
     private Elements                minTempRows = null;
     private Element                 date = null;
     private Element                 time = null;
+    private static Logger           logger;
     private static final String     mainClass = "b-forecast__table";
 
-    boolean                     parse(String[] files, String urls_lst) throws IOException {
-        int         amt = files.length;
+    static {
+        logger = Logger.getLogger(ProgramGUI.title + " errors");
+    }
+
+    boolean                     parse(String[] files, String urls_lst) {
+        final int   amt = files.length;
         boolean     success;
 
         connections = 0;
@@ -42,7 +46,13 @@ class WeatherParser {
         urls = getUrlsList(urls_lst);
         success = processUrls(urls, amt);
         if (!success) {
-            writeLog();
+            try {
+                writeLog();
+                throw new IOException();
+            }
+            catch (IOException e) {
+                ProgramGUI.showErrMsg(e, " Couldn't write to log file");
+            }
         }
         exportToJSON(files);
         return success;
@@ -109,7 +119,7 @@ class WeatherParser {
             else
                 success = false;
 
-            // Identifying the first cell of the table's daytime ("AM" / "PM" / "Night") row;
+            // Identifying the first cell of the table's daytime row;
             String      timeStr = null;
 
             if (time != null)
@@ -126,8 +136,9 @@ class WeatherParser {
                     case "PM":
                         dayTimeCnt = 1;
                         break;
+                    case "Night":
                     default:
-                        dayTimeCnt = 0; //"Night"
+                        dayTimeCnt = 0;
                         break;
                 }
                 for (int i = 0; i < amt; i++) {
@@ -140,7 +151,7 @@ class WeatherParser {
                 success = false;
             connections++;
             float percentage = (connections * 100 / urls.size());
-            ProgramGUI.progress.setValue((int) percentage);
+            ProgramGUI.progressBar.setValue((int) percentage);
             domPos = 0;
         }
         /* end of 'for' loop */
@@ -148,7 +159,6 @@ class WeatherParser {
     }
 
     private void                writeLog() throws IOException {
-        Logger          logger = Logger.getLogger("wParser errors");
         FileHandler     fh;
         String          location;
         String          msg;

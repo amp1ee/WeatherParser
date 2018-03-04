@@ -10,202 +10,232 @@ import java.util.Date;
 import java.util.Properties;
 
 public class ProgramGUI {
-    private static final String     slash = File.separator;
-    private static final String     propFilename = System.getProperty("user.home") + slash + ".wparser";
-    private static final Font       font = new Font("Sans-serif", Font.PLAIN, 18);
-
+    private static final String     slash;
+    static final String             title;
+    private static final String     fileExt;
+    private static final String     listExt;
+    private static final String     propFilename;
     private static JFrame           mainframe;
     private static JFileChooser     urlsChooser;
     private static JFileChooser     fileChooser;
     private static JButton          saveBtn;
     private static JButton          openBtn;
-    static JLabel                   curUrl;
-    static JProgressBar             progress;
     private static String[]         dates;
-    private static String[]         files;
+    private static String[]         outputFiles;
+    static JLabel                   curUrl;
+    static JProgressBar             progressBar;
 
-    private enum exitCodes {
-        OK, ERR
+    static {
+        title = "wParser";
+        slash = File.separator;
+        fileExt = ".json";
+        listExt = ".lst";
+        propFilename = System.getProperty("user.home") + slash + ".wparser";
+
     }
 
-    public static void showErrMsg(Exception e, String url) {
-        String title = mainframe.getTitle() + " - " + e.getClass().getSimpleName();
-        String msg = e.getMessage();
-        if (msg != null && !(e.getCause() instanceof IllegalArgumentException))
-            msg += ": " + url;
-        else if (msg == null)
-            msg = e.getClass().getSimpleName() + ": " + url;
-        JOptionPane.showMessageDialog(mainframe, msg, title, JOptionPane.ERROR_MESSAGE);
-    }
+    private static void initJFrame() {
+        Font    font;
 
-    private static void initJFrame(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException,
-            InstantiationException, IllegalAccessException {
-
-        File jsonFile;
-        File optionsFile;
-        String defaultName;
-        int amt;
-
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        progress = new JProgressBar();
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }
+        catch (Exception e) {
+            showErrMsg(e, " Error caused by UIManager.getSystemLookAndFeel()");
+        }
+        font = new Font("Sans-serif", Font.PLAIN, 18);
+        progressBar = new JProgressBar();
         fileChooser = new JFileChooser();
-        saveBtn = new JButton();
-        fileChooser.setDialogTitle("Save as...");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setFileFilter(new FileNameExtensionFilter(".json only", "json"));
-
         urlsChooser = new JFileChooser();
         openBtn = new JButton();
-        urlsChooser.setDialogTitle("Choose URLs list");
+        saveBtn = new JButton();
+        curUrl = new JLabel("");
+        mainframe = new JFrame();
+
+        mainframe.setSize(350, 100);
+        mainframe.setResizable(false);
+        mainframe.setLocationRelativeTo(null);
+        mainframe.setTitle(title);
+        mainframe.setLayout(new FlowLayout());
+
+        fileChooser.setDialogTitle("Save to...");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter
+                (new FileNameExtensionFilter(fileExt + " only", "lst"));
+
+        urlsChooser.setDialogTitle("Choose URL's list");
         urlsChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        urlsChooser.setFileFilter(new FileNameExtensionFilter(".lst only", "lst"));
+        urlsChooser.setFileFilter
+                (new FileNameExtensionFilter(listExt + " only", "json"));
+        progressBar.setStringPainted(true);
+        progressBar.setFont(font);
+        progressBar.setPreferredSize(new Dimension(340, 40));
+        progressBar.setForeground(Color.BLACK);
+
+        curUrl.setVerticalAlignment(JLabel.BOTTOM);
+        curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
+        curUrl.setVisible(true);
+
+        mainframe.add(progressBar);
+        mainframe.add(curUrl);
+        mainframe.setVisible(true);
+        mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    private static boolean handleDialogs(String[] args) {
+        final int   approve = JFileChooser.APPROVE_OPTION;
+        int         amt;
+        String      exportDir;
+        File        jsonFile;
+        File        optionsFile;
+        String      defaultName;
+
+        defaultName = title.replaceAll("\\s+","_") + "_" + dates[0] + fileExt;
+        jsonFile = new File(defaultName);
+        optionsFile = new File(propFilename);
         if (args.length != 0)
             amt = Integer.parseInt(args[0]);
         else
             amt = 8;
         amt = (amt > 0 && amt <= 8) ? amt : 8;
         dates = getDates(amt);
-        defaultName = "weather_" + dates[0] + ".json";
-        jsonFile = new File(defaultName);
-        optionsFile = new File(propFilename);
         if (optionsFile.exists()) {
             restoreDir(fileChooser, defaultName, urlsChooser);
         } else {
             fileChooser.setSelectedFile(jsonFile);
         }
-    }
-
-    private static boolean handleDialogs() {
-        if (urlsChooser.showOpenDialog(openBtn) == JFileChooser.APPROVE_OPTION &&
-                fileChooser.showSaveDialog(saveBtn) == JFileChooser.APPROVE_OPTION) {
-            mainframe = new JFrame();
-            mainframe.setSize(350, 100);
-            mainframe.setResizable(false);
-            mainframe.setLocationRelativeTo(null);
-            mainframe.setTitle("wParser");
-            mainframe.setLayout(new FlowLayout());
-
+        if (urlsChooser.showOpenDialog(openBtn) == approve &&
+            fileChooser.showSaveDialog(saveBtn) == approve) {
             mainframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent we) {
                     try {
                         storeDir(fileChooser.getSelectedFile().getAbsolutePath(),
                                 urlsChooser.getSelectedFile().getAbsolutePath());
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         e.printStackTrace();
                     }
                     sysExit(exitCodes.OK.ordinal());
                 }
             });
-            progress.setStringPainted(true);
-            progress.setFont(font);
-            progress.setPreferredSize(new Dimension(340, 40));
-            progress.setForeground(Color.BLACK);
-
-            curUrl = new JLabel("");
-            curUrl.setVerticalAlignment(JLabel.BOTTOM);
-            curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
-            curUrl.setVisible(true);
-
-            mainframe.add(progress);
-            mainframe.add(curUrl);
-            mainframe.setVisible(true);
-            mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            String exportDir = fileChooser.getSelectedFile().getAbsolutePath();
+            exportDir = fileChooser.getSelectedFile().getAbsolutePath();
             exportDir = exportDir.substring(0, exportDir.lastIndexOf(slash) + 1);
-            files = getFileNames(exportDir, dates);
+            outputFiles = getFileNames(exportDir, dates);
             return true;
-        } else
+        }
+        else
             return false;
     }
 
     private static boolean parseWeather(WeatherParser wp) {
-        boolean         success = false;
-        String          urlsFilepath = urlsChooser.getSelectedFile().getAbsolutePath();
+        boolean         success;
+        String          urlsFile;
 
-        try {
-            success = wp.parse(files, urlsFilepath);
-            if (wp.connections >= wp.urls.size()) {
-                mainframe.setTitle(mainframe.getTitle() + " - " +
-                    (success ? "Parsing finished" : "Finished with errors"));
-                curUrl.setText(success ?
-                    "Done" : "Finished with errors (see log file)");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        urlsFile = urlsChooser.getSelectedFile().getAbsolutePath();
+        success = wp.parse(outputFiles, urlsFile);
+        if (wp.connections == wp.urls.size()) {
+            mainframe.setTitle(mainframe.getTitle() + " - " +
+                (success ? "Parsing finished" : "Finished with errors"));
+            curUrl.setText(success ?
+                "Done" : "Finished with errors (see log file)");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return success;
     }
 
-    private static void sysExit(int exitcode) {
-        System.exit(exitcode);
+    public static void showErrMsg(Exception e, String data) {
+        final String    title = mainframe.getTitle() + " - " + e.getClass().getSimpleName();
+        String          msg;
+
+        msg = e.getMessage();
+        if (msg != null && !(e.getCause() instanceof IllegalArgumentException))
+            msg += ": " + data;
+        else if (msg == null)
+            msg = e.getClass().getSimpleName() + ": " + data;
+        JOptionPane.showMessageDialog(mainframe, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void main(String[] args) {
-        try {
-            initJFrame(args);
-        } catch (Exception e) {
-            e.getCause();
-            sysExit(exitCodes.ERR.ordinal());
-        }
-        if (!handleDialogs())
-            sysExit(exitCodes.ERR.ordinal());
-        if (parseWeather(new WeatherParser()))
-            mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));
+    private static void sysExit(int exitCode) {
+        System.exit(exitCode);
     }
 
     private static void storeDir(String outPath, String inPath) {
-        Properties p = new Properties();
-        outPath = outPath.substring(0, outPath.lastIndexOf(slash)); // Path without filename
+        Properties p;
+
+        outPath = outPath.substring(0, outPath.lastIndexOf(slash));
+        p = new Properties();
         p.setProperty("lastDir", outPath + slash);
         p.setProperty("urlDir", inPath);
-
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propFilename))) {
-            p.store(bw, "Last used folders for WParser");
-        } catch (IOException e) {
+            p.store(bw, "Last used folders for " + mainframe.getTitle());
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    private static void restoreDir(JFileChooser fc, String outName, JFileChooser urlsChooser) {
-        Properties p = new Properties();
+    private static void restoreDir(JFileChooser fileChooser, String outName, JFileChooser urlsChooser) {
+        Properties  p;
+        File        exportFile;
+        File        urlsFile;
+
+        p = new Properties();
         try (BufferedReader br = new BufferedReader(new FileReader(propFilename))) {
             p.load(br);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
-        File f = new File(p.getProperty("lastDir") + outName);
-        File f2 = new File(p.getProperty("urlDir"));
-        fc.setSelectedFile(f);
-        urlsChooser.setSelectedFile(f2);
+        exportFile = new File(p.getProperty("lastDir") + outName);
+        urlsFile = new File(p.getProperty("urlDir"));
+        fileChooser.setSelectedFile(exportFile);
+        urlsChooser.setSelectedFile(urlsFile);
     }
 
-    private static String[] getDates(int amt) {
-        String[] dates = new String[amt];
-        Date dt = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy");
-        Calendar c = Calendar.getInstance();
+    private static String[] getDates(int size) {
+        String[]            datesArray;
+        Date                date;
+        SimpleDateFormat    sdf;
+        Calendar            cal;
 
-        c.setTime(dt);
-        for (int i = 0; i < amt; i++) { // Tomorrow, after tomorrow, and so on
-            c.add(Calendar.DATE, 1); // Next date
-            dt = c.getTime();
-            dates[i] = sdf.format(dt);
+        datesArray = new String[size];
+        date = new Date();
+        sdf = new SimpleDateFormat("dd_MM_yyyy");
+        cal = Calendar.getInstance();
+        cal.setTime(date);
+        for (int i = 0; i < size; i++) {
+            cal.add(Calendar.DATE, 1); // Adding one day
+            date = cal.getTime();
+            datesArray[i] = sdf.format(date);
         }
-        return dates;
+        return datesArray;
     }
 
     private static String[] getFileNames(String exportDir, String[] dates) {
-        int amt = dates.length;
-        String[] names = new String[amt];
-        for (int i = 0; i < amt; i++) {
+        final int   size = dates.length;
+        String[]    names;
+
+        names = new String[size];
+        for (int i = 0; i < size; i++) {
             names[i] = exportDir.concat("weather_" + dates[i] + ".json");
         }
         return names;
+    }
+
+    private enum exitCodes {
+        OK,
+        ERROR
+    }
+
+    public static void main(String[] args) {
+        initJFrame();
+        if (!handleDialogs(args))
+            sysExit(exitCodes.ERROR.ordinal());
+        if (parseWeather(new WeatherParser()))
+            mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));
     }
 }
