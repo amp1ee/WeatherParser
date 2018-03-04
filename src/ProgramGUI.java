@@ -31,7 +31,7 @@ public class ProgramGUI {
     public static void showErrMsg(Exception e, String url) {
         String title = mainframe.getTitle() + " - " + e.getClass().getSimpleName();
         String msg = e.getMessage();
-        if (msg != null && !msg.contains("Malformed"))
+        if (msg != null && !(e.getCause() instanceof IllegalArgumentException))
             msg += ": " + url;
         else if (msg == null)
             msg = e.getClass().getSimpleName() + ": " + url;
