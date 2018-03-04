@@ -21,7 +21,7 @@ class SummariesGetter {
         String      mainClass = "b-forecast__table";
         List<Document> docs = new ArrayList<>();
 
-        //connecting to cities' latest weather links and getting 'Document' entities;
+        // Connecting to cities' latest weather links and getting 'Document' entities;
         for (String url : urls) {
             docs.add(Jsoup.connect(url).get());
         }

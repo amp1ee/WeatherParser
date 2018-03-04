@@ -5,16 +5,14 @@ import com.google.gson.annotations.SerializedName;
  * Created by djamp on 27.06.2017.
  */
 class Temperatures {
-    private transient String minDayT;
-    private transient String maxDayT;
-
-    private transient String minNightT;
-    private transient String maxNightT;
-
     @SerializedName("_day")
-    private String dayT;
+    private String              dayT;
     @SerializedName("_night")
-    private String nightT;
+    private String              nightT;
+    private transient String    minDayT;
+    private transient String    maxDayT;
+    private transient String    minNightT;
+    private transient String    maxNightT;
 
     Temperatures(String minDayT, String maxDayT, String minNightT, String maxNightT) {
 
@@ -40,7 +38,7 @@ class Temperatures {
         }
 
         if (minDay > maxDay) {
-            minDay = minDay ^ maxDay ^ (maxDay = minDay); //swap (minDay, maxDay) -> (maxDay, minDay)
+            minDay = minDay ^ maxDay ^ (maxDay = minDay); // Swapping (minDay, maxDay) -> (maxDay, minDay)
             this.minDayT = String.valueOf(minDay);
             this.maxDayT = String.valueOf(maxDay);
         }

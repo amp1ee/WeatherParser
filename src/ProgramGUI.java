@@ -9,22 +9,33 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 
-public class FileSaveDialog {
-    private static JFrame mainframe;
-    private static JFileChooser urlsChooser;
-    private static JFileChooser fileChooser;
-    private static JButton saveBtn;
-    private static JButton openBtn;
-    static JLabel curUrl;
-    static JProgressBar progress;
-    private static final String slash = File.separator;
-    private static final String propFilename = System.getProperty("user.home") + slash + ".wparser";
-    private static final Font font = new Font("Sans-serif", Font.PLAIN, 18);
-    private static String[] dates;
-    private static String[] files;
+public class ProgramGUI {
+    private static final String     slash = File.separator;
+    private static final String     propFilename = System.getProperty("user.home") + slash + ".wparser";
+    private static final Font       font = new Font("Sans-serif", Font.PLAIN, 18);
+
+    private static JFrame           mainframe;
+    private static JFileChooser     urlsChooser;
+    private static JFileChooser     fileChooser;
+    private static JButton          saveBtn;
+    private static JButton          openBtn;
+    static JLabel                   curUrl;
+    static JProgressBar             progress;
+    private static String[]         dates;
+    private static String[]         files;
 
     private enum exitCodes {
         OK, ERR
+    }
+
+    public static void showErrMsg(Exception e, String url) {
+        String title = mainframe.getTitle() + " - " + e.getClass().getSimpleName();
+        String msg = e.getMessage();
+        if (msg != null && !msg.contains("Malformed"))
+            msg += ": " + url;
+        else if (msg == null)
+            msg = e.getClass().getSimpleName() + ": " + url;
+        JOptionPane.showMessageDialog(mainframe, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
     private static void initJFrame(String[] args) throws ClassNotFoundException, UnsupportedLookAndFeelException,
@@ -107,12 +118,12 @@ public class FileSaveDialog {
             return false;
     }
 
-    private static boolean parseWeather() {
-        boolean success = false;
-        WeatherParser wp = new WeatherParser();
+    private static boolean parseWeather(WeatherParser wp) {
+        boolean         success = false;
+        String          urlsFilepath = urlsChooser.getSelectedFile().getAbsolutePath();
+
         try {
-            success = wp.parse(files, mainframe,
-                    urlsChooser.getSelectedFile().getAbsolutePath());
+            success = wp.parse(files, urlsFilepath);
             if (wp.connections >= wp.urls.size()) {
                 mainframe.setTitle(mainframe.getTitle() + " - " +
                     (success ? "Parsing finished" : "Finished with errors"));
@@ -143,7 +154,7 @@ public class FileSaveDialog {
         }
         if (!handleDialogs())
             sysExit(exitCodes.ERR.ordinal());
-        if (parseWeather())
+        if (parseWeather(new WeatherParser()))
             mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));
     }
 

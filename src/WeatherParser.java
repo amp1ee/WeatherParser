@@ -30,9 +30,8 @@ class WeatherParser {
     private Element                 date = null;
     private Element                 time = null;
     private static final String     mainClass = "b-forecast__table";
-    private JFrame                  mainframe;
 
-    boolean                     parse(String[] files, JFrame mainframe, String urls_lst) throws IOException {
+    boolean                     parse(String[] files, String urls_lst) throws IOException {
         int         amt = files.length;
         boolean     success;
 
@@ -40,7 +39,6 @@ class WeatherParser {
         iconsList = new ArrayList<>();
         failList = new ArrayList<>();
         temperaturesList = new ArrayList<>();
-        this.mainframe = mainframe;
         urls = getUrlsList(urls_lst);
         success = processUrls(urls, amt);
         if (!success) {
@@ -81,7 +79,7 @@ class WeatherParser {
         for (String url : urls) {
             split = url.split("/");
             cityFromUrl = split.length > 4 ? split[4] : url;
-            FileSaveDialog.curUrl.setText(cityFromUrl);
+            ProgramGUI.curUrl.setText(cityFromUrl);
             cities.add(cityFromUrl);
             if (!(connectToUrl(url)))
                 success = false;
@@ -93,9 +91,9 @@ class WeatherParser {
                 minTempRows = tBody.getElementsByClass(mainClass + "-min-temperature");
                 date = tHead.getElementsByClass(mainClass + "-days-date").first();
                 time = tHead.getElementsByClass(mainClass + "-value").first();
-            } catch (IndexOutOfBoundsException iobe) {
-                failList.add("PARSE ERROR - " + url);
-                iobe.printStackTrace();
+            } catch (IndexOutOfBoundsException | NullPointerException e) {
+                failList.add("PARSE ERROR: " + url);
+                ProgramGUI.showErrMsg(e, url);
                 success = false;
             }
             // Determining the position of our current local month date in the weather-table
@@ -142,7 +140,7 @@ class WeatherParser {
                 success = false;
             connections++;
             float percentage = (connections * 100 / urls.size());
-            FileSaveDialog.progress.setValue((int) percentage);
+            ProgramGUI.progress.setValue((int) percentage);
             domPos = 0;
         }
         /* end of 'for' loop */
@@ -153,9 +151,10 @@ class WeatherParser {
         Logger          logger = Logger.getLogger("wParser errors");
         FileHandler     fh;
         String          location;
+        String          msg;
 
         try {
-            location = URLDecoder.decode(FileSaveDialog.class.getProtectionDomain()
+            location = URLDecoder.decode(ProgramGUI.class.getProtectionDomain()
                 .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
             location = location.substring(0, location.lastIndexOf(File.separator));
             fh = new FileHandler(location + File.separator + "wparser.log", true);
@@ -165,8 +164,10 @@ class WeatherParser {
             e.printStackTrace();
         }
         for (int i = 0; i < failList.size(); i++) {
-            logger.log(Level.SEVERE,failList.get(i) + System.lineSeparator());
-            i++;
+            msg = failList.get(i);
+            if (i == failList.size() - 1)
+                msg += System.lineSeparator();
+            logger.log(Level.SEVERE, msg);
         }
         try {
             logger.getHandlers()[0].close();
@@ -179,25 +180,19 @@ class WeatherParser {
         new JsonExporter().save(temperaturesList, iconsList, files, cities);
     }
 
-    private String getErrMessage(Exception e) {
-        return ("wParser - " + e.getClass().getSimpleName());
-    }
-
     private boolean             connectToUrl(String url) {
-        Exception           exception;
+        Exception           exception = null;
         final int           timeout = 10;
         ExecutorService     executor = Executors.newSingleThreadExecutor();
         Future<?>           future = executor.submit(() -> {
             try {
                 doc = Jsoup.connect(url).get();
             } catch (IOException ioe) {
-                JOptionPane.showMessageDialog(mainframe, ioe,
-                getErrMessage(ioe),
-                JOptionPane.ERROR_MESSAGE);
+                failList.add("ERROR: " +  ioe.getMessage() + ": " + url);
+                ProgramGUI.showErrMsg(ioe, url);
             }
         });
         executor.shutdown();
-        exception = null;
         try {
             future.get(timeout, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
         } catch (InterruptedException e) {
@@ -205,15 +200,14 @@ class WeatherParser {
             System.out.println("Thread future.get() was interrupted");
         } catch (ExecutionException e) {
             exception = e;
-            failList.add("ERROR - " + e.getCause());
+            failList.add("ERROR: " + e.getMessage());
         } catch (TimeoutException e) {
             exception = e;
             future.cancel(true);              //     <-- interrupt the job
-            failList.add("TIMEOUT - " + url);
+            failList.add("TIMEOUT: " + url);
         } finally {
             if (exception != null) {
-                JOptionPane.showMessageDialog(mainframe, exception,
-                        getErrMessage(exception), JOptionPane.ERROR_MESSAGE);
+                ProgramGUI.showErrMsg(exception, url);
             }
         }
         return (exception == null);
