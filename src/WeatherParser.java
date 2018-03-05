@@ -48,7 +48,6 @@ class WeatherParser {
         if (!success) {
             try {
                 writeLog();
-                throw new IOException();
             }
             catch (IOException e) {
                 ProgramGUI.showErrMsg(e, " Couldn't write to log file");
@@ -204,16 +203,16 @@ class WeatherParser {
         });
         executor.shutdown();
         try {
-            future.get(timeout, TimeUnit.SECONDS);  //     <-- wait  seconds to finish
+            future.get(timeout, TimeUnit.SECONDS);  // Wait  seconds to finish
         } catch (InterruptedException e) {
-            exception = e;//     <-- possible error cases
+            exception = e;
             System.out.println("Thread future.get() was interrupted");
         } catch (ExecutionException e) {
             exception = e;
             failList.add("ERROR: " + e.getMessage());
         } catch (TimeoutException e) {
             exception = e;
-            future.cancel(true);              //     <-- interrupt the job
+            future.cancel(true);                 // Interrupt the job
             failList.add("TIMEOUT: " + url);
         } finally {
             if (exception != null) {

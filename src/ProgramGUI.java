@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -20,8 +21,8 @@ public class ProgramGUI {
     private static JFileChooser     fileChooser;
     private static JButton          saveBtn;
     private static JButton          openBtn;
-    private static String[]         dates;
     private static String[]         outputFiles;
+    static JTextArea                textArea;
     static JLabel                   curUrl;
     static JProgressBar             progressBar;
 
@@ -35,8 +36,12 @@ public class ProgramGUI {
     }
 
     private static void initJFrame() {
-        Font    font;
+        PrintStream         ps;
+        TxtOutputStream     tos;
+        Font                font;
 
+        mainframe = new JFrame();
+        mainframe.setTitle(title);
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
@@ -50,13 +55,20 @@ public class ProgramGUI {
         openBtn = new JButton();
         saveBtn = new JButton();
         curUrl = new JLabel("");
-        mainframe = new JFrame();
 
-        mainframe.setSize(350, 100);
+        mainframe.setSize(350, 200);
         mainframe.setResizable(false);
         mainframe.setLocationRelativeTo(null);
-        mainframe.setTitle(title);
         mainframe.setLayout(new FlowLayout());
+
+        textArea = new JTextArea(6, 32);
+        tos = new TxtOutputStream(textArea);
+        ps = new PrintStream(tos);
+        System.setOut(ps);
+        textArea.setFont(new Font("Sans-serif", Font.PLAIN, 10));
+        JScrollPane scroll = new JScrollPane(textArea);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         fileChooser.setDialogTitle("Save to...");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -77,6 +89,7 @@ public class ProgramGUI {
         curUrl.setVisible(true);
 
         mainframe.add(progressBar);
+        mainframe.getContentPane().add(scroll);
         mainframe.add(curUrl);
         mainframe.setVisible(true);
         mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -89,16 +102,17 @@ public class ProgramGUI {
         File        jsonFile;
         File        optionsFile;
         String      defaultName;
+        String[]    dates;
 
-        defaultName = title.replaceAll("\\s+","_") + "_" + dates[0] + fileExt;
-        jsonFile = new File(defaultName);
-        optionsFile = new File(propFilename);
         if (args.length != 0)
             amt = Integer.parseInt(args[0]);
         else
             amt = 8;
         amt = (amt > 0 && amt <= 8) ? amt : 8;
         dates = getDates(amt);
+        defaultName = title.replaceAll("\\s+","_") + "_" + dates[0] + fileExt;
+        jsonFile = new File(defaultName);
+        optionsFile = new File(propFilename);
         if (optionsFile.exists()) {
             restoreDir(fileChooser, defaultName, urlsChooser);
         } else {
@@ -148,15 +162,22 @@ public class ProgramGUI {
     }
 
     public static void showErrMsg(Exception e, String data) {
-        final String    title = mainframe.getTitle() + " - " + e.getClass().getSimpleName();
-        String          msg;
-
-        msg = e.getMessage();
+        final String    excName = e.getClass().getSimpleName();
+        String          title;
+/*      String          msg;
+*/
+        if ((title = mainframe.getTitle()) != null)
+            title += " - " + excName;
+        else
+            title = excName;
+/*        msg = e.getMessage();
         if (msg != null && !(e.getCause() instanceof IllegalArgumentException))
             msg += ": " + data;
         else if (msg == null)
-            msg = e.getClass().getSimpleName() + ": " + data;
+            msg = excName + ": " + data;
         JOptionPane.showMessageDialog(mainframe, msg, title, JOptionPane.ERROR_MESSAGE);
+*/
+        System.out.println(title + System.lineSeparator() + data.trim());
     }
 
     private static void sysExit(int exitCode) {
