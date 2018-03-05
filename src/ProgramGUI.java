@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -40,6 +41,7 @@ public class ProgramGUI {
     private static void initJFrame() {
         PrintStream         ps;
         TxtOutputStream     tos;
+        DefaultCaret        caret;
         Font                font;
 
         mainframe = new JFrame();
@@ -175,6 +177,11 @@ public class ProgramGUI {
         else
             title = excName;
         System.out.println(title + System.lineSeparator() + data.trim());
+        scrollDown(textArea);
+    }
+
+    public static void scrollDown(JTextArea textArea) {
+        textArea.setCaretPosition(textArea.getText().length());
     }
 
     private static void sysExit(int exitCode) {

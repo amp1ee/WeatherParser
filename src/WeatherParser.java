@@ -3,7 +3,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -172,11 +171,12 @@ class WeatherParser {
             location = URLDecoder.decode(ProgramGUI.class.getProtectionDomain()
                 .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
             location = location.substring(location.indexOf('/') == 0 ? 1 : 0, location.lastIndexOf('/'));
-            fileName = location + File.separator + "wparser.log";
+            fileName = location + '/' + "wparser.log";
             fh = new FileHandler(fileName, true);
             fh.setFormatter(new LogFormatter());
             logger.addHandler(fh);
             ProgramGUI.textArea.append("Updated the log file: \n" + fileName + "\n");
+            ProgramGUI.scrollDown(ProgramGUI.textArea);
         } catch (NullPointerException | URISyntaxException | NoSuchFileException e) {
             e.printStackTrace();
         }
