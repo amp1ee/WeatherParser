@@ -3,6 +3,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -170,9 +171,7 @@ class WeatherParser {
         try {
             location = URLDecoder.decode(ProgramGUI.class.getProtectionDomain()
                 .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
-            System.out.println(location);
             location = location.substring(location.indexOf('/') == 0 ? 1 : 0, location.lastIndexOf('/'));
-            System.out.println(location);
             fileName = location + File.separator + "wparser.log";
             fh = new FileHandler(fileName, true);
             fh.setFormatter(new LogFormatter());

@@ -61,7 +61,7 @@ public class ProgramGUI {
         mainframe.setSize(WIDTH, HEIGHT);
         mainframe.setResizable(false);
         mainframe.setLocationRelativeTo(null);
-        mainframe.setLayout(new FlowLayout());
+        mainframe.setLayout(new BorderLayout());
 
         textArea = new JTextArea(6, 32);
         textArea.append("Parsing started...\n");
@@ -84,16 +84,17 @@ public class ProgramGUI {
                 (new FileNameExtensionFilter(listExt + " only", "lst"));
         progressBar.setStringPainted(true);
         progressBar.setFont(font);
-        progressBar.setPreferredSize(new Dimension(340, 40));
+        progressBar.setPreferredSize(new Dimension(312, 40));
         progressBar.setForeground(Color.BLACK);
 
         curUrl.setVerticalAlignment(JLabel.BOTTOM);
         curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
+        curUrl.setHorizontalAlignment(SwingConstants.CENTER);
         curUrl.setVisible(true);
 
-        mainframe.add(progressBar);
-        mainframe.getContentPane().add(scroll);
-        mainframe.add(curUrl);
+        mainframe.add(progressBar, BorderLayout.NORTH);
+        mainframe.getContentPane().add(scroll, BorderLayout.CENTER);
+        mainframe.add(curUrl, BorderLayout.SOUTH);
         mainframe.setVisible(true);
         mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
