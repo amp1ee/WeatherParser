@@ -1,13 +1,5 @@
 import com.google.gson.annotations.SerializedName;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Icons
  * (Precipitation class)
@@ -17,9 +9,9 @@ class Icons {
     @SerializedName("_icon_day")
     private String                      dayIcon;
     @SerializedName("_icon_night")
-    private String                      nightIcon;
+    private String                      nightIcon;/*
     private transient SummariesGetter   sg = new SummariesGetter();
-    private transient Set<String>       summaries = new HashSet<>();
+    private transient Set<String>       summaries = new HashSet<>();*/
 
     private void adaptNames(String origDayIcon, String origNightIcon) {
 
@@ -72,7 +64,7 @@ class Icons {
             this.nightIcon = "icon_cloud_moon";
     }
 
-    private void collect(String FILE_NAME) throws IOException {
+/*    private void collect(String FILE_NAME) throws IOException {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
                         new FileInputStream(FILE_NAME)));
@@ -82,9 +74,9 @@ class Icons {
             urls.add(line);
         }
         summaries = sg.getAllSummaries(urls);
-    }
+    }*/
 
-    public void print() {
+/*    public void print() {
         if (!summaries.isEmpty())
             for (String s : summaries) {
                 System.out.println(s);
@@ -96,7 +88,7 @@ class Icons {
 
     Icons(String FILE_NAME) throws IOException {
         collect(FILE_NAME);
-    }
+    }*/
 
     Icons(String dayIcon, String nightIcon) {
         adaptNames(dayIcon, nightIcon);

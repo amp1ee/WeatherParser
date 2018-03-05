@@ -1,9 +1,9 @@
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Temperatures
- * Created by djamp on 27.06.2017.
- */
+*   Temperatures
+*/
+
 class Temperatures {
     @SerializedName("_day")
     private String              dayT;

@@ -8,28 +8,24 @@ import java.util.List;
 
 public class TxtOutputStream extends OutputStream {
 
-// *************************************************************************************************
-// INSTANCE MEMBERS
-// *************************************************************************************************
-
     private byte[]                          oneByte;                                                    // array for write(int val);
     private Appender                        appender;                                                   // most recent action
 
-    public TxtOutputStream(JTextArea txtara) {
-        this(txtara,1000);
+    TxtOutputStream(JTextArea textArea) {
+        this(textArea,1000);
     }
 
-    public TxtOutputStream(JTextArea txtara, int maxlin) {
-        if(maxlin<1) { throw new IllegalArgumentException("TextAreaOutputStream maximum lines must be positive (value="+maxlin+")"); }
+    private TxtOutputStream(JTextArea textArea, int maxLin) {
+        if(maxLin<1) { throw new IllegalArgumentException("TextAreaOutputStream maximum lines must be positive (value="+maxLin+")"); }
         oneByte=new byte[1];
-        appender=new Appender(txtara,maxlin);
+        appender=new Appender(textArea,maxLin);
     }
 
     /** Clear the current console text area. */
-    public synchronized void clear() {
+    /*public synchronized void clear() {
         if(appender!=null) { appender.clear(); }
     }
-
+*/
     public synchronized void close() {
         appender=null;
     }
@@ -59,10 +55,6 @@ public class TxtOutputStream extends OutputStream {
         }
     }
 
-// *************************************************************************************************
-// STATIC MEMBERS
-// *************************************************************************************************
-
     static class Appender
             implements Runnable
     {
@@ -75,11 +67,11 @@ public class TxtOutputStream extends OutputStream {
         private boolean                     clear;
         private boolean                     queue;
 
-        Appender(JTextArea txtara, int maxlin) {
-            textArea = txtara;
-            maxLines = maxlin;
-            lengths  = new LinkedList<Integer>();
-            values   = new ArrayList<String>();
+        Appender(JTextArea textArea, int maxLin) {
+            this.textArea = textArea;
+            maxLines = maxLin;
+            lengths  = new LinkedList<>();
+            values   = new ArrayList<>();
 
             curLength= 0;
             clear    = false;
@@ -90,21 +82,21 @@ public class TxtOutputStream extends OutputStream {
             values.add(val);
             if(queue) { queue=false; EventQueue.invokeLater(this); }
         }
-
+/*
         synchronized void clear() {
             clear=true;
             curLength=0;
             lengths.clear();
             values.clear();
             if(queue) { queue=false; EventQueue.invokeLater(this); }
-        }
+        }*/
 
         public synchronized void run() {
             if (clear)
                 textArea.setText("");
             for (String val : values) {
                 curLength += val.length();
-                if (val.endsWith(EOL1) || val.endsWith(EOL2)) {
+                if (val.endsWith(System.lineSeparator()) || val.endsWith(EOL2)) {
                     if (lengths.size() >= maxLines)
                         textArea.replaceRange("",0, lengths.removeFirst());
                     lengths.addLast(curLength);
@@ -116,7 +108,6 @@ public class TxtOutputStream extends OutputStream {
             clear = false;
             queue = true;
         }
-
         static private final String         EOL1 = "\n";
         static private final String         EOL2 = System.getProperty("line.separator",EOL1);
     }

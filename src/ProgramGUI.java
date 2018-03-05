@@ -1,6 +1,5 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -12,6 +11,8 @@ import java.util.Properties;
 
 public class ProgramGUI {
     private static final String     slash;
+    private static final int        WIDTH;
+    private static final int        HEIGHT;
     static final String             title;
     private static final String     fileExt;
     private static final String     listExt;
@@ -28,11 +29,12 @@ public class ProgramGUI {
 
     static {
         title = "wParser";
+        WIDTH = 350;
+        HEIGHT = 220;
         slash = File.separator;
         fileExt = ".json";
         listExt = ".lst";
         propFilename = System.getProperty("user.home") + slash + ".wparser";
-
     }
 
     private static void initJFrame() {
@@ -56,7 +58,7 @@ public class ProgramGUI {
         saveBtn = new JButton();
         curUrl = new JLabel("");
 
-        mainframe.setSize(350, 200);
+        mainframe.setSize(WIDTH, HEIGHT);
         mainframe.setResizable(false);
         mainframe.setLocationRelativeTo(null);
         mainframe.setLayout(new FlowLayout());
@@ -163,7 +165,7 @@ public class ProgramGUI {
         return success;
     }
 
-    public static void showErrMsg(Exception e, String data) {
+    static void showErrMsg(Exception e, String data) {
         final String    excName = e.getClass().getSimpleName();
         String          title;
 

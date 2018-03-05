@@ -15,38 +15,39 @@ import java.util.List;
  */
 
 class JsonExporter {
-    private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
-            .setPrettyPrinting().create();
-    private String MAP_FILE = "cities_map.txt";
-    private BufferedReader mapReader = new BufferedReader(
-        new InputStreamReader(JsonExporter.class.getResourceAsStream(MAP_FILE)));
-    private List<String> citiesList = new ArrayList<>();
+    private static Gson             GSON;
+    private static final String     MAP_FILE = "cities_map.txt";
+    private List<String>            citiesList;
 
-    void save(List<Temperatures> tList, List<Icons> iList, String[] files, List<String> cities) {
-        FileWriter writer = null;
-        String ln;
-        int amt = files.length;
-        try {
-            while ((ln = mapReader.readLine()) != null) {
-                citiesList.add(ln);
+    JsonExporter() {
+        GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting().create();
+        citiesList = new ArrayList<>();
+    }
+
+    void save(List<Temperatures> tempList, List<Icons> iconList, String[] files, List<String> cities) {
+        final int           numFiles = files.length;
+        final int           listSize = tempList.size();
+        WeatherContainer    container;
+        Weather             w;
+        Temperatures        curTemp;
+        Icons               curIcon;
+        String              line;
+
+        try (BufferedReader mapReader = new BufferedReader(new InputStreamReader
+                (JsonExporter.class.getResourceAsStream(MAP_FILE)))) {
+            while ((line = mapReader.readLine()) != null) {
+                citiesList.add(line);
             }
         } catch (IOException ioe) {
             System.err.println("IOE on opening cities_map.txt");
-        } finally {
-            try {
-                mapReader.close();
-            } catch (IOException ioe) {
-                System.err.println("IOE on closing mapReader");
-            }
         }
-        int tListSz = tList.size();
 
-        for (int j = 0; j < amt; j++) {
-            WeatherContainer container = new WeatherContainer();
-            try  {
-                writer = new FileWriter(files[j]);
-                for (int i = 0; i < (tListSz / amt); i++) {
-                    Weather w = new Weather();
+        for (int n = 0; n < numFiles; n++) {
+            container = new WeatherContainer();
+            try (FileWriter writer = new FileWriter(files[n])) {
+                for (int i = 0; i < (listSize / numFiles); i++) {
+                    w = new Weather();
                     for (String row : citiesList) {
                         String curCity = row.split(" :")[0];
                         if (curCity.equals(cities.get(i)))
@@ -54,33 +55,19 @@ class JsonExporter {
                     }
                     if (w.getCity() == null)
                         w.setCity(cities.get(i).toLowerCase());
-                    Temperatures curTmp = tList.get(j + (amt * i));
-                    w.setDayTemp(curTmp.getDayT());
-                    w.setNightTemp(curTmp.getNightT());
+                    curTemp = tempList.get(n + (numFiles * i));
+                    w.setDayTemp(curTemp.getDayT());
+                    w.setNightTemp(curTemp.getNightT());
 
-                    Icons curIco = iList.get(j + (amt * i));
-                    w.setDayIcon(curIco.getDayIcon());
-                    w.setNightIcon(curIco.getNightIcon());
+                    curIcon = iconList.get(n + (numFiles * i));
+                    w.setDayIcon(curIcon.getDayIcon());
+                    w.setNightIcon(curIcon.getNightIcon());
                     container.getWeather().add(w);
                 }
                 GSON.toJson(container, writer);
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                if (writer != null) {
-                    try {
-                        writer.flush();
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
-
-    }
-
-    JsonExporter() {
-
     }
 }
