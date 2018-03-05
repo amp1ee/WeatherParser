@@ -62,6 +62,7 @@ public class ProgramGUI {
         mainframe.setLayout(new FlowLayout());
 
         textArea = new JTextArea(6, 32);
+        textArea.append("Parsing started...\n");
         tos = new TxtOutputStream(textArea);
         ps = new PrintStream(tos);
         System.setOut(ps);
@@ -73,12 +74,12 @@ public class ProgramGUI {
         fileChooser.setDialogTitle("Save to...");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setFileFilter
-                (new FileNameExtensionFilter(fileExt + " only", "lst"));
+                (new FileNameExtensionFilter(fileExt + " only", "json"));
 
         urlsChooser.setDialogTitle("Choose URL's list");
         urlsChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         urlsChooser.setFileFilter
-                (new FileNameExtensionFilter(listExt + " only", "json"));
+                (new FileNameExtensionFilter(listExt + " only", "lst"));
         progressBar.setStringPainted(true);
         progressBar.setFont(font);
         progressBar.setPreferredSize(new Dimension(340, 40));
@@ -152,6 +153,7 @@ public class ProgramGUI {
                 (success ? "Parsing finished" : "Finished with errors"));
             curUrl.setText(success ?
                 "Done" : "Finished with errors (see log file)");
+            textArea.append(success ? "No errors occurred\n" : "\n");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -164,19 +166,11 @@ public class ProgramGUI {
     public static void showErrMsg(Exception e, String data) {
         final String    excName = e.getClass().getSimpleName();
         String          title;
-/*      String          msg;
-*/
+
         if ((title = mainframe.getTitle()) != null)
             title += " - " + excName;
         else
             title = excName;
-/*        msg = e.getMessage();
-        if (msg != null && !(e.getCause() instanceof IllegalArgumentException))
-            msg += ": " + data;
-        else if (msg == null)
-            msg = excName + ": " + data;
-        JOptionPane.showMessageDialog(mainframe, msg, title, JOptionPane.ERROR_MESSAGE);
-*/
         System.out.println(title + System.lineSeparator() + data.trim());
     }
 

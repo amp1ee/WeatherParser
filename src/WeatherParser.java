@@ -160,15 +160,18 @@ class WeatherParser {
     private void                writeLog() throws IOException {
         FileHandler     fh;
         String          location;
+        String          fileName;
         String          msg;
 
         try {
             location = URLDecoder.decode(ProgramGUI.class.getProtectionDomain()
                 .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
             location = location.substring(0, location.lastIndexOf(File.separator));
-            fh = new FileHandler(location + File.separator + "wparser.log", true);
+            fileName = location + File.separator + "wparser.log";
+            fh = new FileHandler(fileName, true);
             fh.setFormatter(new LogFormatter());
             logger.addHandler(fh);
+            ProgramGUI.textArea.append("Updated the log file: \n" + fileName + "\n");
         } catch (NullPointerException | URISyntaxException | NoSuchFileException e) {
             e.printStackTrace();
         }
