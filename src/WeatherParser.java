@@ -102,9 +102,8 @@ class WeatherParser {
                 ProgramGUI.showErrMsg(e, url);
                 success = false;
             }
-            // Determining the position of our current local month date in the weather-table
+            // Determining the position of our current local day-of-month in the weather-table
             String day;
-
             if (date != null) {
                 day = date.text();
                 if (day.equals(curDay)) {
@@ -170,7 +169,7 @@ class WeatherParser {
         try {
             location = URLDecoder.decode(ProgramGUI.class.getProtectionDomain()
                 .getCodeSource().getLocation().toURI().getPath(), "UTF-8");
-            location = location.substring(location.indexOf('/') == 0 ? 1 : 0, location.lastIndexOf('/'));
+            location = location.substring(location.indexOf(':') == 2 ? 1 : 0, location.lastIndexOf('/'));
             fileName = location + '/' + "wparser.log";
             fh = new FileHandler(fileName, true);
             fh.setFormatter(new LogFormatter());
