@@ -3,10 +3,7 @@ import com.google.gson.GsonBuilder;
 import weather.WeatherContainer;
 import weather.Weather;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,5 +66,7 @@ class JsonExporter {
                 e.printStackTrace();
             }
         }
+        ProgramGUI.textArea.append("\nSuccessfully written files to " + files[0].substring(
+                0, files[0].lastIndexOf(File.separator)) + '\n');
     }
 }

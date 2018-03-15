@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,7 +34,7 @@ public class ProgramGUI {
     static {
         title = "wParser";
         WIDTH = 600;
-        HEIGHT = 400;
+        HEIGHT = 300;
         slash = File.separator;
         fileExt = ".json";
         listExt = ".lst";
@@ -126,10 +125,10 @@ public class ProgramGUI {
         panel.add(progressBar, BorderLayout.EAST);
         panel.setVisible(true);
 
-        mainframe.add(panel, BorderLayout.NORTH);
+        mainframe.add(panel, BorderLayout.SOUTH);
         mainframe.add(slider, BorderLayout.WEST);
         mainframe.getContentPane().add(scroll, BorderLayout.CENTER);
-        mainframe.add(curUrl, BorderLayout.SOUTH);
+        mainframe.add(curUrl, BorderLayout.NORTH);
         mainframe.setVisible(true);
         mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
@@ -181,7 +180,7 @@ public class ProgramGUI {
                 "Done" : "Finished with errors (see log file)");
             textArea.append(success ? "No errors occurred\n" : "\n");
             try {
-                Thread.sleep(2000);
+                Thread.sleep(8000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
