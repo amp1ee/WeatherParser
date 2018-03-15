@@ -45,11 +45,9 @@ public class ProgramGUI {
 
     private static void initJFrame() {
         JPanel              panel;
-        PrintStream         ps;
+        JScrollPane         scroll;
         TxtOutputStream     tos;
         Font                font;
-        URL                 iconURL;
-        Image               icon;
 
         mainframe = new JFrame();
         mainframe.setTitle(title);
@@ -72,19 +70,15 @@ public class ProgramGUI {
         mainframe.setResizable(false);
         mainframe.setLocationRelativeTo(null);
         mainframe.setLayout(new BorderLayout());
-        if ((iconURL = ProgramGUI.class.getClassLoader().getResource("favicon.ico")) != null) {
-            icon = new ImageIcon(iconURL).getImage();
-            icon.flush();
-            mainframe.setIconImage(icon);
-        }
 
         textArea = new JTextArea(6, 32);
         textArea.setMargin(new Insets(5,10,5,5));
         tos = new TxtOutputStream(textArea);
-        ps = new PrintStream(tos);
-        System.setOut(ps);
+        System.setOut(new PrintStream(tos));
         textArea.setFont(new Font("Sans-serif", Font.PLAIN, 11));
-        JScrollPane scroll = new JScrollPane(textArea);
+        textArea.setEditable(false);
+
+        scroll = new JScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
@@ -99,8 +93,6 @@ public class ProgramGUI {
                 (new FileNameExtensionFilter(listExt + " only", "lst"));
         progressBar.setStringPainted(true);
         progressBar.setFont(font);
-        progressBar.setBorderPainted(true);
-        progressBar.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
         progressBar.setPreferredSize(new Dimension(WIDTH - 60, 40));
         progressBar.setForeground(Color.BLACK);
 
@@ -111,6 +103,7 @@ public class ProgramGUI {
         slider.setLabelTable(slider.createStandardLabels(1));
         slider.setPreferredSize(new Dimension(60, 150));
         slider.setSnapToTicks(true);
+        slider.setFocusable(false);
         slider.setVisible(true);
 
         curUrl.setVerticalAlignment(JLabel.BOTTOM);
@@ -132,6 +125,7 @@ public class ProgramGUI {
         panel.add(start, BorderLayout.WEST);
         panel.add(progressBar, BorderLayout.EAST);
         panel.setVisible(true);
+
         mainframe.add(panel, BorderLayout.NORTH);
         mainframe.add(slider, BorderLayout.WEST);
         mainframe.getContentPane().add(scroll, BorderLayout.CENTER);
@@ -147,21 +141,20 @@ public class ProgramGUI {
         String[]    dates;
 
         amt = slider.getValue();
-        amt = (amt > 0 && amt <= 8) ? amt : 7;
         dates = getDates(amt);
         if (urlsChooser.showOpenDialog(openBtn) == APPROVE &&
             fileChooser.showSaveDialog(saveBtn) == APPROVE) {
             mainframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent we) {
-                    try {
-                        storeProps(fileChooser.getSelectedFile().getAbsolutePath(),
-                                urlsChooser.getSelectedFile().getAbsolutePath());
-                    }
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    sysExit(exitCodes.OK.ordinal());
+                try {
+                    storeProps(fileChooser.getSelectedFile().getAbsolutePath(),
+                            urlsChooser.getSelectedFile().getAbsolutePath());
                 }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                sysExit(exitCodes.OK.ordinal());
+            }
             });
             exportDir = fileChooser.getSelectedFile().getAbsolutePath();
             exportDir = exportDir.substring(0, exportDir.lastIndexOf(slash) + 1);
@@ -172,10 +165,12 @@ public class ProgramGUI {
             return false;
     }
 
-    private static boolean parseWeather(WeatherParser wp) {
+    private static boolean parseWeather() {
         boolean         success;
+        WeatherParser   wp;
         String          urlsFile;
 
+        wp = new WeatherParser();
         urlsFile = urlsChooser.getSelectedFile().getAbsolutePath();
         textArea.setText("Parsing has started...\n");
         success = wp.parse(outputFiles, urlsFile);
@@ -315,7 +310,7 @@ public class ProgramGUI {
         }
         if (!handleDialogs())
             sysExit(exitCodes.ERROR.ordinal());
-        if (parseWeather(new WeatherParser()))
+        if (parseWeather())
             mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));
     }
 }

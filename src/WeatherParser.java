@@ -72,7 +72,7 @@ class WeatherParser {
         boolean     success = true;
         int         domPos = 0;
         Calendar    cal = Calendar.getInstance();
-        int         dayOfMonth = cal.get(Calendar.DAY_OF_MONTH); // the day of month
+        int         dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
         String      curDay = String.valueOf(dayOfMonth);
         String[]    split;
         String      cityFromUrl;
@@ -231,21 +231,22 @@ class WeatherParser {
     }
 
     private void                addIcons(int childNumber, Element summary) {
-        String dayIcon;
-        String nightIcon;
-        Elements row = summary.getElementsByTag("td");
+        String      dayIcon;
+        String      nightIcon;
+        Elements    row;
+
+        row = summary.getElementsByTag("td");
         dayIcon = row.get(childNumber - 1).text();
         nightIcon = row.get(childNumber).text();
-
         if (dayIcon != null && nightIcon != null)
             iconsList.add(new Icons(dayIcon, nightIcon));
     }
 
     private void                addTemps(int childNumber, Elements maxTempRows, Elements minTempRows) {
-        String maxDayT;
-        String minDayT;
-        String maxNightT;
-        String minNightT;
+        String  maxDayT;
+        String  minDayT;
+        String  maxNightT;
+        String  minNightT;
 
         maxDayT = maxTempRows.first().child(childNumber)
                 .child(0).text();
@@ -257,7 +258,6 @@ class WeatherParser {
                 .child(0).text();
         if (maxNightT != null && minNightT != null) {
             Temperatures t = new Temperatures(minDayT, maxDayT, minNightT, maxNightT);
-            t.parseData();
             temperaturesList.add(t);
         }
     }

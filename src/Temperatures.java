@@ -19,9 +19,10 @@ class Temperatures {
         this.maxDayT = maxDayT;
         this.minNightT = minNightT;
         this.maxNightT = maxNightT;
+        this.parseData();
     }
 
-    void parseData() {
+    private void parseData() {
         int minDay = 0;
         int maxDay = 0;
         int minNight = 0;
@@ -33,7 +34,7 @@ class Temperatures {
             maxDay = Integer.parseInt(this.maxDayT);
             maxNight = Integer.parseInt(this.maxNightT);
         } catch (NumberFormatException e) {
-            System.out.println("Failed to parse temperature:" + e.getMessage());
+            System.out.println("Failed to parse temperature: " + e.getMessage());
         }
 
         if (minDay > maxDay) {
