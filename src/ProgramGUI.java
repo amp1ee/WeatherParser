@@ -34,8 +34,8 @@ public class ProgramGUI {
 
     static {
         title = "wParser";
-        WIDTH = 390;
-        HEIGHT = 220;
+        WIDTH = 600;
+        HEIGHT = 400;
         slash = File.separator;
         fileExt = ".json";
         listExt = ".lst";
@@ -83,7 +83,7 @@ public class ProgramGUI {
         tos = new TxtOutputStream(textArea);
         ps = new PrintStream(tos);
         System.setOut(ps);
-        textArea.setFont(new Font("Sans-serif", Font.PLAIN, 10));
+        textArea.setFont(new Font("Sans-serif", Font.PLAIN, 11));
         JScrollPane scroll = new JScrollPane(textArea);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -99,7 +99,9 @@ public class ProgramGUI {
                 (new FileNameExtensionFilter(listExt + " only", "lst"));
         progressBar.setStringPainted(true);
         progressBar.setFont(font);
-        progressBar.setPreferredSize(new Dimension(312, 40));
+        progressBar.setBorderPainted(true);
+        progressBar.setBorder(BorderFactory.createEmptyBorder(2,8,2,8));
+        progressBar.setPreferredSize(new Dimension(WIDTH - 60, 40));
         progressBar.setForeground(Color.BLACK);
 
         slider = new JSlider(JSlider.VERTICAL, 1, 8, 5);
@@ -107,7 +109,7 @@ public class ProgramGUI {
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
         slider.setLabelTable(slider.createStandardLabels(1));
-        slider.setPreferredSize(new Dimension(40, 150));
+        slider.setPreferredSize(new Dimension(60, 150));
         slider.setSnapToTicks(true);
         slider.setVisible(true);
 
@@ -122,7 +124,7 @@ public class ProgramGUI {
                 startPressed = true;
             }
         });
-        start.setPreferredSize(new Dimension(70, progressBar.getHeight()));
+        start.setPreferredSize(new Dimension(60, progressBar.getHeight()));
 
         panel = new JPanel(new BorderLayout());
         panel.setSize(new Dimension
@@ -131,7 +133,7 @@ public class ProgramGUI {
         panel.add(progressBar, BorderLayout.EAST);
         panel.setVisible(true);
         mainframe.add(panel, BorderLayout.NORTH);
-        mainframe.add(slider, BorderLayout.EAST);
+        mainframe.add(slider, BorderLayout.WEST);
         mainframe.getContentPane().add(scroll, BorderLayout.CENTER);
         mainframe.add(curUrl, BorderLayout.SOUTH);
         mainframe.setVisible(true);

@@ -227,7 +227,7 @@ class WeatherParser {
                 ProgramGUI.showErrMsg(exception, url);
             }
         }
-        return (exception == null);
+        return (failList.size() == 0);
     }
 
     private void                addIcons(int childNumber, Element summary) {
