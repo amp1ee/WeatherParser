@@ -1,10 +1,11 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,6 +24,9 @@ public class ProgramGUI {
     private static JFileChooser     fileChooser;
     private static JButton          saveBtn;
     private static JButton          openBtn;
+    private static JToggleButton    start;
+    private static boolean          startPressed;
+    private static JSlider          slider;
     private static String[]         outputFiles;
     static JTextArea                textArea;
     static JLabel                   curUrl;
@@ -30,19 +34,22 @@ public class ProgramGUI {
 
     static {
         title = "wParser";
-        WIDTH = 350;
+        WIDTH = 390;
         HEIGHT = 220;
         slash = File.separator;
         fileExt = ".json";
         listExt = ".lst";
         propFilename = System.getProperty("user.home") + slash + ".wparser";
+        startPressed = false;
     }
 
     private static void initJFrame() {
+        JPanel              panel;
         PrintStream         ps;
         TxtOutputStream     tos;
-        DefaultCaret        caret;
         Font                font;
+        URL                 iconURL;
+        Image               icon;
 
         mainframe = new JFrame();
         mainframe.setTitle(title);
@@ -58,15 +65,21 @@ public class ProgramGUI {
         urlsChooser = new JFileChooser();
         openBtn = new JButton();
         saveBtn = new JButton();
+        start = new JToggleButton("Start");
         curUrl = new JLabel("");
 
         mainframe.setSize(WIDTH, HEIGHT);
         mainframe.setResizable(false);
         mainframe.setLocationRelativeTo(null);
         mainframe.setLayout(new BorderLayout());
+        if ((iconURL = ProgramGUI.class.getClassLoader().getResource("favicon.ico")) != null) {
+            icon = new ImageIcon(iconURL).getImage();
+            icon.flush();
+            mainframe.setIconImage(icon);
+        }
 
         textArea = new JTextArea(6, 32);
-        textArea.append("Parsing started...\n");
+        textArea.setMargin(new Insets(5,10,5,5));
         tos = new TxtOutputStream(textArea);
         ps = new PrintStream(tos);
         System.setOut(ps);
@@ -89,47 +102,57 @@ public class ProgramGUI {
         progressBar.setPreferredSize(new Dimension(312, 40));
         progressBar.setForeground(Color.BLACK);
 
+        slider = new JSlider(JSlider.VERTICAL, 1, 8, 5);
+        slider.setMajorTickSpacing(1);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setLabelTable(slider.createStandardLabels(1));
+        slider.setPreferredSize(new Dimension(40, 150));
+        slider.setSnapToTicks(true);
+        slider.setVisible(true);
+
         curUrl.setVerticalAlignment(JLabel.BOTTOM);
         curUrl.setFont(new Font("Sans-serif", Font.BOLD, 14));
         curUrl.setHorizontalAlignment(SwingConstants.CENTER);
         curUrl.setVisible(true);
 
-        mainframe.add(progressBar, BorderLayout.NORTH);
+        start.addActionListener((ActionEvent e) -> {
+            if (start.isEnabled()) {
+                start.setEnabled(false);
+                startPressed = true;
+            }
+        });
+        start.setPreferredSize(new Dimension(70, progressBar.getHeight()));
+
+        panel = new JPanel(new BorderLayout());
+        panel.setSize(new Dimension
+                (mainframe.getWidth(), progressBar.getHeight()));
+        panel.add(start, BorderLayout.WEST);
+        panel.add(progressBar, BorderLayout.EAST);
+        panel.setVisible(true);
+        mainframe.add(panel, BorderLayout.NORTH);
+        mainframe.add(slider, BorderLayout.EAST);
         mainframe.getContentPane().add(scroll, BorderLayout.CENTER);
         mainframe.add(curUrl, BorderLayout.SOUTH);
         mainframe.setVisible(true);
         mainframe.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    private static boolean handleDialogs(String[] args) {
-        final int   approve = JFileChooser.APPROVE_OPTION;
+    private static boolean handleDialogs() {
+        final int   APPROVE = JFileChooser.APPROVE_OPTION;
         int         amt;
         String      exportDir;
-        File        jsonFile;
-        File        optionsFile;
-        String      defaultName;
         String[]    dates;
 
-        if (args.length != 0)
-            amt = Integer.parseInt(args[0]);
-        else
-            amt = 8;
-        amt = (amt > 0 && amt <= 8) ? amt : 8;
+        amt = slider.getValue();
+        amt = (amt > 0 && amt <= 8) ? amt : 7;
         dates = getDates(amt);
-        defaultName = title.replaceAll("\\s+","_") + "_" + dates[0] + fileExt;
-        jsonFile = new File(defaultName);
-        optionsFile = new File(propFilename);
-        if (optionsFile.exists()) {
-            restoreDir(fileChooser, defaultName, urlsChooser);
-        } else {
-            fileChooser.setSelectedFile(jsonFile);
-        }
-        if (urlsChooser.showOpenDialog(openBtn) == approve &&
-            fileChooser.showSaveDialog(saveBtn) == approve) {
+        if (urlsChooser.showOpenDialog(openBtn) == APPROVE &&
+            fileChooser.showSaveDialog(saveBtn) == APPROVE) {
             mainframe.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent we) {
                     try {
-                        storeDir(fileChooser.getSelectedFile().getAbsolutePath(),
+                        storeProps(fileChooser.getSelectedFile().getAbsolutePath(),
                                 urlsChooser.getSelectedFile().getAbsolutePath());
                     }
                     catch (Exception e) {
@@ -152,6 +175,7 @@ public class ProgramGUI {
         String          urlsFile;
 
         urlsFile = urlsChooser.getSelectedFile().getAbsolutePath();
+        textArea.setText("Parsing has started...\n");
         success = wp.parse(outputFiles, urlsFile);
         if (wp.connections == wp.urls.size()) {
             mainframe.setTitle(mainframe.getTitle() + " - " +
@@ -180,6 +204,7 @@ public class ProgramGUI {
         scrollDown(textArea);
     }
 
+    @SuppressWarnings("all")
     public static void scrollDown(JTextArea textArea) {
         textArea.setCaretPosition(textArea.getText().length());
     }
@@ -188,23 +213,26 @@ public class ProgramGUI {
         System.exit(exitCode);
     }
 
-    private static void storeDir(String outPath, String inPath) {
+    private static void storeProps(String outPath, String inPath) {
         Properties p;
 
         outPath = outPath.substring(0, outPath.lastIndexOf(slash));
         p = new Properties();
         p.setProperty("lastDir", outPath + slash);
         p.setProperty("urlDir", inPath);
+        p.setProperty("slider", String.valueOf(slider.getValue()));
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(propFilename))) {
-            p.store(bw, "Last used folders for " + mainframe.getTitle());
+            p.store(bw, "Last used folders and properties for " + mainframe.getTitle());
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void restoreDir(JFileChooser fileChooser, String outName, JFileChooser urlsChooser) {
+    private static void restoreProps(JFileChooser fileChooser, String outName, JFileChooser urlsChooser) {
         Properties  p;
+        String      sValue;
+        int         sliderValue;
         File        exportFile;
         File        urlsFile;
 
@@ -217,6 +245,10 @@ public class ProgramGUI {
         }
         exportFile = new File(p.getProperty("lastDir") + outName);
         urlsFile = new File(p.getProperty("urlDir"));
+        if ((sValue = p.getProperty("slider")) != null) {
+            sliderValue = Integer.parseInt(sValue);
+            slider.setValue(sliderValue);
+        }
         fileChooser.setSelectedFile(exportFile);
         urlsChooser.setSelectedFile(urlsFile);
     }
@@ -257,8 +289,29 @@ public class ProgramGUI {
     }
 
     public static void main(String[] args) {
+        File        jsonFile;
+        File        optionsFile;
+        String      defaultName;
+
         initJFrame();
-        if (!handleDialogs(args))
+        defaultName = title.replaceAll("\\s+","_") + "_" + getDates(1)[0] + fileExt;
+        jsonFile = new File(defaultName);
+        optionsFile = new File(propFilename);
+        if (optionsFile.exists()) {
+            restoreProps(fileChooser, defaultName, urlsChooser);
+        } else {
+            fileChooser.setSelectedFile(jsonFile);
+        }
+        textArea.setText("Set the amount of days and press \"Start\"\n");
+        while (!startPressed) {
+            try {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (!handleDialogs())
             sysExit(exitCodes.ERROR.ordinal());
         if (parseWeather(new WeatherParser()))
             mainframe.dispatchEvent(new WindowEvent(mainframe, WindowEvent.WINDOW_CLOSING));

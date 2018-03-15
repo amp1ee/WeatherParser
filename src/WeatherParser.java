@@ -143,9 +143,10 @@ class WeatherParser {
                         addIcons(childNumber, tBody.getElementsByClass(mainClass + "-summary").first());
                     }
                     catch (IndexOutOfBoundsException e) {
-                        failList.add("PARSE ERROR: " + url);
-                        ProgramGUI.showErrMsg(e, url);
+                        failList.add("PARSE ERROR (try to decrease the amount of days): " + url);
+                        ProgramGUI.showErrMsg(e, " (try to decrease the amount of days) " + url);
                         success = false;
+                        break;
                     }
                 }
             }
@@ -256,7 +257,7 @@ class WeatherParser {
                 .child(0).text();
         if (maxNightT != null && minNightT != null) {
             Temperatures t = new Temperatures(minDayT, maxDayT, minNightT, maxNightT);
-            t.adapt();
+            t.parseData();
             temperaturesList.add(t);
         }
     }

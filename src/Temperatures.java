@@ -15,14 +15,13 @@ class Temperatures {
     private transient String    maxNightT;
 
     Temperatures(String minDayT, String maxDayT, String minNightT, String maxNightT) {
-
         this.minDayT = minDayT;
         this.maxDayT = maxDayT;
         this.minNightT = minNightT;
         this.maxNightT = maxNightT;
     }
 
-    void adapt() {
+    void parseData() {
         int minDay = 0;
         int maxDay = 0;
         int minNight = 0;
